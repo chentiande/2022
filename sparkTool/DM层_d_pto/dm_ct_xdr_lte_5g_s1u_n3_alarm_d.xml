@@ -1,0 +1,41 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_alarm_d" period="1d"
+               desc="小区_用户面-4/5G话单-告警展示表(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_alarm_d partition(p_date='${p_date}')
+		
+select alarm_id as alarm_id,
+电信感知大数据分析平台 as alarm_nms,
+'' as alarm_messageid,
+province_id as province_id,
+province_name as province_name,
+area_id as area_id,
+area_name as area_name,
+region_id as region_id,
+region_name as region_name,
+1001 as alarm_unit,
+cell_name as alarm_node_name,
+0101 as alarm_type,
+alarm_severity as alarm_severity,
+starttime as alarm_time,
+0 as alarm_check_flag,
+取近3天的指标填入，格式详见《告警描述》txt as alarm_text,
+alarm_status as alarm_status,
+alarm_exist_day_cnt as alarm_exist_day_cnt,
+'' as sheet_status
+from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_alarm_cell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

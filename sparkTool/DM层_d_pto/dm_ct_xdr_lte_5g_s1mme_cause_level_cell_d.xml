@@ -1,0 +1,39 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1mme_cause_level_cell_d" period="1d"
+               desc="原因码层级/物联网小区_信令面-4/5G话单-s1mme(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1mme_cause_level_cell_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+max(region_id) as region_id,
+max(region_name) as region_name,
+max(city_id) as city_id,
+max(city_name) as city_name,
+max(tac) as tac,
+eci as eci,
+max(cell_id) as cell_id,
+max(cell_name) as cell_name,
+max(enb_id) as enb_id,
+max(enb_name) as enb_name,
+max(longitude) as longitude,
+max(latitude) as latitude,
+cause_may as cause_may,
+sum(s1_mme_cnt) as s1_mme_cnt
+from ${source_db}.dw_ct_xdr_lte_s1u_s1mme_mme_cell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

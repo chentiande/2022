@@ -1,0 +1,106 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_http_geo_d" period="1d"
+               desc="全国、省、地市、区县_用户面-4/5G话单-http(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	 <tableName>tmp_dm_ct_xdr_lte_5g_s1u</tableName>
+<sql>
+<![CDATA[select 
+dl_tcp_retrans_packet,
+http_request_cnt,
+http_respdelay,
+http_respdelay_cnt,
+http_succ_cnt,
+input_packet,
+output_packet,
+province_id,
+province_name,
+region_id,
+region_name,
+starttime,
+tcp_connect_delay,
+tcp_connect_delay_cnt,
+tcp_connect_request_cnt,
+tcp_connect_succ_cnt,
+dl_tcp_reordering_packet,
+tcp_estab_poor_delay_cnt,
+ul_tcp_reordering_packet,
+ul_tcp_retrans_packet,
+tcp_estab_excellent_delay_cnt
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_http_sp_term_cell_
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ 	]]>
+		</sql>
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_http_geo_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+1 as geo_id,
+1277 as ne_type,
+NULL as province_id,
+'' as province_name,
+NULL as region_id,
+'' as region_name,
+NULL as city_id,
+'' as city_name,
+(case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end) as tcp_build_success_rat,
+(case when sum(nvl(http_request_cnt,0))>0 then (sum(nvl(http_succ_cnt,0)))/(sum(nvl(http_request_cnt,0))) else 0 end) as http_service_success_rat,
+(case when sum(nvl(http_respdelay_cnt,0))>0 then (sum(nvl(http_respdelay,0)))/(sum(nvl(http_respdelay_cnt,0))) else 0 end) as http_avg_respdelay,
+(case when sum(nvl(tcp_connect_delay_cnt,0))>0 then (sum(nvl(tcp_connect_delay,0)))/(sum(nvl(tcp_connect_delay_cnt,0))) else 0 end) as tcp_connect_avg_delay,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_reordering_packet,0))+sum(nvl(dl_tcp_reordering_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_renum_rat,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_retrans_packet,0))+sum(nvl(dl_tcp_retrans_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_discordnum_rat,
+(case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end) as tcp_estab_excellent_delay_rate,
+weightedAverage(array((case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end),0.6 , (case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end),0.4)) as service_good_rat
+from tmp_dm_ct_xdr_lte_5g_s1u
+union all
+select substr('${p_start_time}',1,8) as starttime,
+province_id as geo_id,
+1278 as ne_type,
+province_id as province_id,
+province_name as province_name,
+NULL as region_id,
+'' as region_name,
+NULL as city_id,
+'' as city_name,
+(case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end) as tcp_build_success_rat,
+(case when sum(nvl(http_request_cnt,0))>0 then (sum(nvl(http_succ_cnt,0)))/(sum(nvl(http_request_cnt,0))) else 0 end) as http_service_success_rat,
+(case when sum(nvl(http_respdelay_cnt,0))>0 then (sum(nvl(http_respdelay,0)))/(sum(nvl(http_respdelay_cnt,0))) else 0 end) as http_avg_respdelay,
+(case when sum(nvl(tcp_connect_delay_cnt,0))>0 then (sum(nvl(tcp_connect_delay,0)))/(sum(nvl(tcp_connect_delay_cnt,0))) else 0 end) as tcp_connect_avg_delay,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_reordering_packet,0))+sum(nvl(dl_tcp_reordering_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_renum_rat,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_retrans_packet,0))+sum(nvl(dl_tcp_retrans_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_discordnum_rat,
+(case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end) as tcp_estab_excellent_delay_rate,
+weightedAverage(array((case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end),0.6 , (case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end),0.4)) as service_good_rat
+from tmp_dm_ct_xdr_lte_5g_s1u
+ group by province_id,province_name
+union all
+select substr('${p_start_time}',1,8) as starttime,
+region_id as geo_id,
+1279 as ne_type,
+province_id as province_id,
+province_name as province_name,
+region_id as region_id,
+region_name as region_name,
+NULL as city_id,
+'' as city_name,
+(case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end) as tcp_build_success_rat,
+(case when sum(nvl(http_request_cnt,0))>0 then (sum(nvl(http_succ_cnt,0)))/(sum(nvl(http_request_cnt,0))) else 0 end) as http_service_success_rat,
+(case when sum(nvl(http_respdelay_cnt,0))>0 then (sum(nvl(http_respdelay,0)))/(sum(nvl(http_respdelay_cnt,0))) else 0 end) as http_avg_respdelay,
+(case when sum(nvl(tcp_connect_delay_cnt,0))>0 then (sum(nvl(tcp_connect_delay,0)))/(sum(nvl(tcp_connect_delay_cnt,0))) else 0 end) as tcp_connect_avg_delay,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_reordering_packet,0))+sum(nvl(dl_tcp_reordering_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_renum_rat,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_retrans_packet,0))+sum(nvl(dl_tcp_retrans_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_discordnum_rat,
+(case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end) as tcp_estab_excellent_delay_rate,
+weightedAverage(array((case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end),0.6 , (case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end),0.4)) as service_good_rat
+from tmp_dm_ct_xdr_lte_5g_s1u
+ group by province_id,region_id,region_name,province_name
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

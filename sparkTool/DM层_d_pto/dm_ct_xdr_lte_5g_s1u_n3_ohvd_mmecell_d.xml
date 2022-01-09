@@ -1,0 +1,104 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_ohvd_mmecell_d" period="1d"
+               desc="小区-4/5G话单-OTHER/HTTP/VIDEO/DNS/S1MME-单小区定界定段-MME(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	 <tableName>tmp_dm_ct_xdr_lte_5g_s1u</tableName>
+<sql>
+<![CDATA[select 
+00:00:00,
+23:59:59,
+00:00:00~2020,
+0 as abnormal_flag,
+0 as abnormal_msisdn_num,
+abnormal_record_num,
+attach_fail_cnt,
+attach_req_cnt,
+mme_ip,
+mme_name,
+0 as msisdn_num,
+nci_eci,
+province_id,
+province_name,
+s1_ho_out_fail_cnt,
+s1_ho_out_req_cnt,
+service_fail_cnt,
+service_req_cnt,
+starttime,
+total_record_num,
+ue_pdnconn_fail_cnt,
+ue_pdnconn_req_cnt,
+例原话单为2020,
+开始时间为2020,
+abnormal_record_rate
+ from ${source_db}.dw_ct_xdr_lte_s1u_s1mme_mmecell_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+00:00:00,
+23:59:59,
+00:00:00~2020,
+abnormal_flag,
+abnormal_msisdn_num,
+0 as abnormal_record_num,
+attach_fail_cnt,
+attach_req_cnt,
+mme_ip,
+mme_name,
+msisdn_num,
+0 as nci_eci,
+province_id,
+province_name,
+s1_ho_out_fail_cnt,
+s1_ho_out_req_cnt,
+service_fail_cnt,
+service_req_cnt,
+starttime,
+total_record_num,
+ue_pdnconn_fail_cnt,
+ue_pdnconn_req_cnt,
+例原话单为2020,
+开始时间为2020,
+abnormal_record_rate
+ from ${source_db}.dw_ct_xdr_lte_s1u_s1mme_mme_
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ 	]]>
+		</sql>
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_mmecell_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+nci_eci as nci_eci,
+mme_ip as mme_ip,
+max(mme_name) as mme_name,
+(case when sum(nvl(abnormal_record_num,0))>0 then (nvl(abnormal_record_num,0))/sum(nvl(abnormal_record_num,0)) else 0 end) as mme_total_record_abnormal_top_rate,
+total_record_num as mme_total_record_num,
+abnormal_record_rate as mme_abnormal_record_rate,
+abnormal_flag as mme_abnormal_flag,
+msisdn_num as mme_msisdn_num,
+abnormal_msisdn_num as mme_abnormal_msisdn_num,
+(case when nvl(attach_req_cnt,0)>0 then (nvl(attach_fail_cnt,0))/(nvl(attach_req_cnt,0)) else 0 end) as mme_service_registration_abnormal_rate,
+(case when nvl(service_req_cnt,0)>0 then (nvl(service_fail_cnt,0))/(nvl(service_req_cnt,0)) else 0 end) as mme_service_reques_abnormal_rate,
+(case when nvl(ue_pdnconn_req_cnt,0)>0 then (nvl(ue_pdnconn_fail_cnt,0))/(nvl(ue_pdnconn_req_cnt,0)) else 0 end) as mme_pdnconn_abnormal_rate,
+(case when nvl(s1_ho_out_req_cnt,0)>0 then (nvl(s1_ho_out_fail_cnt,0))/(nvl(s1_ho_out_req_cnt,0)) else 0 end) as mme_s1_ho_out_abnormal_rate,
+total_record_num as mmecell_total_record_num,
+abnormal_record_rate as mmecell_abnormal_record_rate,
+(case when nvl(attach_req_cnt,0)>0 then (nvl(attach_fail_cnt,0))/(nvl(attach_req_cnt,0)) else 0 end) as mmecell_service_registration_abnormal_rate,
+(case when nvl(service_req_cnt,0)>0 then (nvl(service_fail_cnt,0))/(nvl(service_req_cnt,0)) else 0 end) as mmecell_service_reques_abnormal_rate,
+(case when nvl(ue_pdnconn_req_cnt,0)>0 then (nvl(ue_pdnconn_fail_cnt,0))/(nvl(ue_pdnconn_req_cnt,0)) else 0 end) as mmecell_pdnconn_abnormal_rate,
+(case when nvl(s1_ho_out_req_cnt,0)>0 then (nvl(s1_ho_out_fail_cnt,0))/(nvl(s1_ho_out_req_cnt,0)) else 0 end) as mmecell_s1_ho_out_abnormal_rate
+from tmp_dm_ct_xdr_lte_5g_s1u
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

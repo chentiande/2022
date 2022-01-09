@@ -1,0 +1,50 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1mme_client_geo_d" period="1d"
+               desc="全国、省、地市、区县_信令面/客户-4/5G话单-s1mme(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1mme_client_geo_d partition(p_date='${p_date}')
+		
+ select substr('${p_start_time}',1,8) as starttime,
+1.ne_type=1277，赋值 1
+2.ne_type=1278,赋值 province_id
+3.ne_type=1279,赋值 region_id as geo_id,
+（根据dm表的空间汇总维度手工填写）
+1277:全国
+1278:省
+1279:地市 as ne_type,
+province_id（全国维度，此指标为空） as province_id,
+province_name（全国维度，此指标为空） as province_name,
+region_id（全国、省维度，此指标为空） as region_id,
+region_name（全国、省维度，此指标为空） as region_name,
+'' as city_id,
+'' as city_name,
+client_id as client_id,
+max(client_name) as client_name,
+avg((case when sum(nvl(eps_attach_req_cnt,0))>0 then (sum(nvl(eps_attach_succ_cnt,0)))/(sum(nvl(eps_attach_req_cnt,0))) else 0 end)) as eps_attach_succ_rate,
+avg((case when sum(nvl(ue_pdnconn_req_cnt,0))>0 then (sum(nvl(ue_pdnconn_succ_cnt,0)))/(sum(nvl(ue_pdnconn_req_cnt,0))) else 0 end)) as ue_pdnconn_succ_rate,
+avg((case when sum(nvl(tau_req_cnt,0))>0 then (sum(nvl(tau_succ_cnt,0)))/(sum(nvl(tau_req_cnt,0))) else 0 end)) as tau_succ_rate,
+avg((case when (sum(nvl(s1_ho_in_req_cnt,0))+sum(nvl(s1_ho_out_req_cnt,0)))>0 then (sum(nvl(s1_ho_in_suc_cnt,0))+sum(nvl(s1_ho_out_suc_cnt,0)))/(sum(nvl(s1_ho_in_req_cnt,0))+sum(nvl(s1_ho_out_req_cnt,0))) else 0 end)) as s1_ho_suc_rate,
+avg((case when sum(nvl(x2_ho_req_cnt,0))>0 then (sum(nvl(x2_ho_suc_cnt,0)))/(sum(nvl(x2_ho_req_cnt,0))) else 0 end)) as x2_ho_suc_rate,
+avg((case when sum(nvl(initial_cont_succ_cnt,0))>0 then (sum(nvl(initial_cont_dealy,0)))/(sum(nvl(initial_cont_succ_cnt,0))) else 0 end)) as initial_cont_avg_dealy
+from 
+(select * from ${source_db}.dw_ct_xdr_lte_s1u_s1mme_term_cell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}'  
+) t1 
+ inner join (select distinct apn,client_id,client_name from dim_ne_company where client_id is not null) t2 on t1.apn=t2.apn  
+1、group by client_id
+2、group by province_id,client_id
+3、group by region_id,client_id
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

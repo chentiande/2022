@@ -1,0 +1,68 @@
+<AggrSqlConfig topicId="dm_ct_pm_lte_cell_kpi_d" period="1d"
+               desc="端到端小区_无线小区性能KPI(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_pm_lte_cell_kpi_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+cellkey as gnb_enb_nc_ec,
+SUBSTRING_INDEX(cellkey,'_',1) as gnb_enb_id,
+SUBSTRING_INDEX(cellkey,'_',-1) as nc_ec_id,
+conv( case when SUBSTRING_INDEX(cellkey,'_',-1)<=15) then concat(conv(SUBSTRING_INDEX(cellkey,'_',1),10,16),'0',conv(SUBSTRING_INDEX(cellkey,'_',-1),10,16)) else concat(conv(SUBSTRING_INDEX(cellkey,'_',1),10,16),conv(SUBSTRING_INDEX(cellkey,'_',-1),10,16)) end,16,10) as nci_eci,
+avg_act_usr as avg_act_usr_cnt,
+rrc_userconnmean as rrc_userconnmean,
+rrc_userconnmax as rrc_userconnmax,
+data_dl as data_dl,
+data_ul as data_ul,
+cell_unserv_cnt as cell_unserv_cnt,
+cell_unserv_time as cell_unserv_time,
+puschprbtotmeandl_rate as puschprbtotmeandl_rate,
+puschprbtotmeanul_rate as puschprbtotmeanul_rate,
+is_dl_highload as is_dl_highload,
+puschprbtotmaxdl_rate as puschprbtotmaxdl_rate,
+puschprbtotmaxul_rate as puschprbtotmaxul_rate,
+rrc_connreestab_rate as rrc_connreestab_rate,
+radio_succconn_rate as radio_succconn_rate,
+rrc_succconnestab_rate as rrc_succconnestab_rate,
+paging_cong_rate as paging_cong_rate,
+erab_drop_rate as erab_drop_rate,
+ho_succoutintramode_rate as ho_succoutintramode_rate,
+cqi_excellent_ratio as cqi_excellent_ratio,
+erab_drop_qci1_rate as erab_drop_qci1_rate,
+radio_succconn_qci1_rate as radio_succconn_qci1_rate,
+pdcp_sdulosspktul_qci1_rate as pdcp_sdulosspktul_qci1_rate,
+pdcp_sdulosspktdl_qci1_rate as pdcp_sdulosspktdl_qci1_rate,
+ho_succoutintraenb_rate as ho_succoutintraenb_rate,
+is_wc_radio_succconn_rate as is_wc_radio_succconn_rate,
+is_wc_rrc_succconnestab_rate as is_wc_rrc_succconnestab_rate,
+is_wc_paging_cong_rate as is_wc_paging_cong_rate,
+is_wc_erab_drop_rate as is_wc_erab_drop_rate,
+is_wc_rrc_connreestab_rate as is_wc_rrc_connreestab_rate,
+is_wc_ho_succoutintramode_rate as is_wc_ho_succoutintramode_rate,
+is_wc_cqi_excellent_ratio as is_wc_cqi_excellent_rate,
+is_wc_erab_drop_qci1_rate as is_wc_erab_drop_qci1_rate,
+is_wc_radio_succconn_qci1_rate as is_wc_radio_succconn_qci1_rate,
+is_wc_pdcp_sdulosspktul_qci1_rate as is_wc_pdcp_sdulosspktul_qci1_rate,
+is_wc_pdcp_sdulosspktdl_qci1_rate as is_wc_pdcp_sdulosspktdl_qci1_rate,
+rsrp_avg as rsrp_avg,
+rsrp_sample_sum as rsrp_sample_cnt,
+rsrp_ge_110_sampel_sum as rsrp_ge_110_sample_cnt,
+covergae_rate as coverage_rate,
+is_weakcov_cell as is_weakcov_cell,
+p_provincecode as province_id
+from ${source_db}.用户提� where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

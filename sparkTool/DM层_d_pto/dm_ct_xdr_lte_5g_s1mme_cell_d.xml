@@ -1,0 +1,43 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1mme_cell_d" period="1d"
+               desc="物联网小区_信令面-4/5G话单-s1mme(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1mme_cell_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+max(region_id) as region_id,
+max(region_name) as region_name,
+max(city_id) as city_id,
+max(city_name) as city_name,
+max(tac) as tac,
+eci as eci,
+max(cell_id) as cell_id,
+max(cell_name) as cell_name,
+max(enb_id) as enb_id,
+max(enb_name) as enb_name,
+max(longitude) as longitude,
+max(latitude) as latitude,
+avg((case when sum(nvl(eps_attach_req_cnt,0))>0 then (sum(nvl(eps_attach_succ_cnt,0)))/(sum(nvl(eps_attach_req_cnt,0))) else 0 end)) as eps_attach_succ_rate,
+avg((case when sum(nvl(ue_pdnconn_req_cnt,0))>0 then (sum(nvl(ue_pdnconn_succ_cnt,0)))/(sum(nvl(ue_pdnconn_req_cnt,0))) else 0 end)) as ue_pdnconn_succ_rate,
+avg((case when sum(nvl(tau_req_cnt,0))>0 then (sum(nvl(tau_succ_cnt,0)))/(sum(nvl(tau_req_cnt,0))) else 0 end)) as tau_succ_rate,
+avg((case when (sum(nvl(s1_ho_in_req_cnt,0))+sum(nvl(s1_ho_out_req_cnt,0)))>0 then (sum(nvl(s1_ho_in_suc_cnt,0))+sum(nvl(s1_ho_out_suc_cnt,0)))/(sum(nvl(s1_ho_in_req_cnt,0))+sum(nvl(s1_ho_out_req_cnt,0))) else 0 end)) as s1_ho_suc_rate,
+avg((case when sum(nvl(x2_ho_req_cnt,0))>0 then (sum(nvl(x2_ho_suc_cnt,0)))/(sum(nvl(x2_ho_req_cnt,0))) else 0 end)) as x2_ho_suc_rate,
+avg((case when sum(nvl(initial_cont_succ_cnt,0))>0 then (sum(nvl(initial_cont_dealy,0)))/(sum(nvl(initial_cont_succ_cnt,0))) else 0 end)) as initial_cont_avg_dealy
+from ${source_db}.dw_ct_xdr_lte_s1u_s1mme_term_cell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

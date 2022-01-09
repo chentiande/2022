@@ -1,0 +1,55 @@
+create database if not exists ${hiveconf:database};
+use ${hiveconf:database};
+drop table if exists dm_ct_pm_lte_cell_kpi_d;
+create EXTERNAL table IF NOT EXISTS dm_ct_pm_lte_cell_kpi_d(
+`starttime` timestamp,
+`gnb_enb_nc_ec` varchar(64),
+`gnb_enb_id` bigint,
+`nc_ec_id` int,
+`nci_eci` bigint,
+`avg_act_usr_cnt` decimal(24,4),
+`rrc_userconnmean` decimal(24,4),
+`rrc_userconnmax` decimal(24,4),
+`data_dl` decimal(24,4),
+`data_ul` decimal(24,4),
+`cell_unserv_cnt` bigint,
+`cell_unserv_time` decimal(24,4),
+`puschprbtotmeandl_rate` decimal(12,6),
+`puschprbtotmeanul_rate` decimal(12,6),
+`is_dl_highload` int,
+`puschprbtotmaxdl_rate` decimal(12,6),
+`puschprbtotmaxul_rate` decimal(12,6),
+`rrc_connreestab_rate` decimal(12,6),
+`radio_succconn_rate` decimal(12,6),
+`rrc_succconnestab_rate` decimal(12,6),
+`paging_cong_rate` decimal(12,6),
+`erab_drop_rate` decimal(12,6),
+`ho_succoutintramode_rate` decimal(12,6),
+`cqi_excellent_ratio` decimal(12,6),
+`erab_drop_qci1_rate` decimal(12,6),
+`radio_succconn_qci1_rate` decimal(12,6),
+`pdcp_sdulosspktul_qci1_rate` decimal(12,6),
+`pdcp_sdulosspktdl_qci1_rate` decimal(12,6),
+`ho_succoutintraenb_rate` decimal(12,6),
+`is_wc_radio_succconn_rate` int,
+`is_wc_rrc_succconnestab_rate` int,
+`is_wc_paging_cong_rate` int,
+`is_wc_erab_drop_rate` int,
+`is_wc_rrc_connreestab_rate` int,
+`is_wc_ho_succoutintramode_rate` int,
+`is_wc_cqi_excellent_rate` int,
+`is_wc_erab_drop_qci1_rate` int,
+`is_wc_radio_succconn_qci1_rate` int,
+`is_wc_pdcp_sdulosspktul_qci1_rate` int,
+`is_wc_pdcp_sdulosspktdl_qci1_rate` int,
+`rsrp_avg` decimal(24,4),
+`rsrp_sample_cnt` bigint,
+`rsrp_ge_110_sample_cnt` bigint,
+`coverage_rate` decimal(12,6),
+`is_weakcov_cell` int,
+`province_id` int) 
+PARTITIONED BY ( 
+  `p_date` string)
+ROW FORMAT DELIMITED 
+  FIELDS TERMINATED BY '|' NULL DEFINED AS '' 
+location "${hivevar:basepath}/dm_ct_pm_lte_cell_kpi_d/";

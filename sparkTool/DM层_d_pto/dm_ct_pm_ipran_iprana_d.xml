@@ -1,0 +1,29 @@
+<AggrSqlConfig topicId="dm_ct_pm_ipran_iprana_d" period="1d"
+               desc="IPRAN-IPRAN A性能表(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_pm_ipran_iprana_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+A_EQP as a_eqp_name,
+CPU_USE_RAT as cpu_use_rat,
+MEMORY_USE_RAT as memory_use_rat,
+Peak_bandwidth_RAT as peak_bandwidth_rat,
+DATA_PACKLOSS_RAT as data_packloss_rat,
+Service_delay as service_delay
+from ${source_db}.用户提� where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

@@ -1,0 +1,50 @@
+<AggrSqlConfig topicId="dm_ct_fm_alarm" period="1m"
+               desc="设备告警表">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_fm_alarm partition(p_date='${p_date}')
+		
+select orgAlarmId as org_alarm_id,
+alarmId as alarm_id,
+eventTime as event_time,
+clearTime as clear_time,
+severity as severity,
+alarmType as alarm_type,
+clearFlag as clear_flag,
+objectId as object_id,
+objectName as object_name,
+objectType as object_type,
+IP as object_ip,
+locateObjectId as locate_object_id,
+locateObjectName as locate_object_name,
+locateObjectType as locate_object_type,
+locateInfo as locate_info,
+vendorName as vendor_name,
+alarmTitle as alarm_title,
+probableCause as probable_cause,
+maintainPropose as maintain_propose,
+domain as domain,
+totalCount as total_count,
+EnodebID as enodeb_id,
+CellID as eci,
+resourceStatus as resource_status,
+PROVINCE_ID as province_id,
+PROVINCE_DESC as province_name,
+REGION_ID as region_id,
+REGION_DESC as region_name
+from ${source_db}.用户提� where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

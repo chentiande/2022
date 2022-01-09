@@ -1,0 +1,27 @@
+<AggrSqlConfig topicId="dm_ct_pm_mr_usr_d" period="1d"
+               desc="端到端用户_用户性能MR(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_pm_mr_usr_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+msisdn as msisdn,
+avg_rsrp as rsrp_avg,
+rsrp_tolal_samples_cnt as rsrp_tolal_samples_cnt,
+rsrp_110_samples_cnt as rsrp_110_samples_cnt
+from ${source_db}.用户提� where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

@@ -1,0 +1,28 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_http_sgw_cell_d" period="1d"
+               desc="小区/SGW-4/5G话单-HTTP-业务质量定界定段(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_http_sgw_cell_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+nci_eci as nci_eci,
+sgw_upf_ip as sgw_upf_ip,
+max(sgw_upf_name) as sgw_upf_name
+from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_http_sp_term_cell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

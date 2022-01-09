@@ -1,0 +1,52 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_http_client_geo_d" period="1d"
+               desc="全国、省、地市、区县/客户_用户面-4/5G话单-http(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_http_client_geo_d partition(p_date='${p_date}')
+		
+ select substr('${p_start_time}',1,8) as starttime,
+1.ne_type=1277，赋值 1
+2.ne_type=1278,赋值 province_id
+3.ne_type=1279,赋值 region_id as geo_id,
+（根据dm表的空间汇总维度手工填写）
+1277:全国
+1278:省
+1279:地市 as ne_type,
+province_id（全国维度，此指标为空） as province_id,
+province_name（全国维度，此指标为空） as province_name,
+region_id（全国、省维度，此指标为空） as region_id,
+region_name（全国、省维度，此指标为空） as region_name,
+'' as city_id,
+'' as city_name,
+client_id as client_id,
+max(client_name) as client_name,
+(case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end) as tcp_build_success_rat,
+(case when sum(nvl(http_request_cnt,0))>0 then (sum(nvl(http_succ_cnt,0)))/(sum(nvl(http_request_cnt,0))) else 0 end) as http_service_success_rat,
+(case when sum(nvl(http_respdelay_cnt,0))>0 then (sum(nvl(http_respdelay,0)))/(sum(nvl(http_respdelay_cnt,0))) else 0 end) as http_avg_respdelay,
+(case when sum(nvl(tcp_connect_delay_cnt,0))>0 then (sum(nvl(tcp_connect_delay,0)))/(sum(nvl(tcp_connect_delay_cnt,0))) else 0 end) as tcp_connect_avg_delay,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_reordering_packet,0))+sum(nvl(dl_tcp_reordering_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_renum_rat,
+(case when (sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))>0 then ((sum(nvl(ul_tcp_retrans_packet,0))+sum(nvl(dl_tcp_retrans_packet,0)))/(sum(nvl(output_packet,0))+sum(nvl(input_packet,0)))) else 0 end) as tcp_discordnum_rat,
+(case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end) as tcp_estab_excellent_delay_rate,
+weightedAverage(array((case when (sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0)))>0 then (sum(nvl(tcp_estab_excellent_delay_cnt,0)))/(sum(nvl(tcp_estab_excellent_delay_cnt,0))+sum(nvl(tcp_estab_poor_delay_cnt,0))) else 0 end),0.6 , (case when sum(nvl(tcp_connect_request_cnt,0))>0 then (sum(nvl(tcp_connect_succ_cnt,0)))/(sum(nvl(tcp_connect_request_cnt,0))) else 0 end),0.4)) as service_good_rat
+from 
+(select * from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_http_sp_term_cell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}'  
+) t1 
+ inner join (select distinct apn,client_id,client_name from dim_ne_company where client_id is not null) t2 on t1.dnn_apn=t2.apn  
+1、group by client_id
+2、group by province_id,client_id
+3、group by region_id,client_id
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

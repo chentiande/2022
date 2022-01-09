@@ -1,0 +1,240 @@
+<AggrSqlConfig topicId="dm_ct_xdr_ohvd_usrcell_d" period="1d"
+               desc="用户/小区-4/5G话单-other/http/video/dns-纬度表（1天）">
+      <functions>
+	<function>weightedAverage</function>
+  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_ohvd_usrcell_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(imsi_supi) as imsi_supi,
+msisdn as msisdn,
+nci_eci as nci_eci,
+max(nc_ec_id) as nc_ec_id,
+max(cell_name) as cell_name,
+max(province_id) as province_id,
+max(province_name) as province_name,
+max(region_id) as region_id,
+max(region_name) as region_name,
+max(city_id) as city_id,
+max(city_name) as city_name,
+max(area_id) as area_id,
+max(area_name) as area_name,
+max(gnb_enb_id) as gnb_enb_id,
+max(gnb_enb_name) as gnb_enb_name,
+max(gnb_enb_ip) as gnb_enb_ip,
+sum(output_packet) as output_packet,
+sum(input_packet) as input_packet,
+sum(ul_tcp_reordering_packet) as ul_tcp_reordering_packet,
+sum(dl_tcp_reordering_packet) as dl_tcp_reordering_packet,
+sum(http_dl_rate_data) as http_dl_rate_data,
+sum(http_dl_rate_data_cnt) as http_dl_rate_data_cnt,
+sum(http_ul_rate_data) as http_ul_rate_data,
+sum(http_ul_rate_data_cnt) as http_ul_rate_data_cnt,
+sum(game_conn_delay) as game_conn_delay,
+sum(game_conn_delay_cnt) as game_conn_delay_cnt,
+sum(chkhand_good) as chkhand_good,
+sum(chkhand_bad) as chkhand_bad,
+sum(rtt_ul_server_good) as rtt_ul_server_good,
+sum(rtt_ul_server_bat) as rtt_ul_server_bat,
+sum(rtt_dl_termeral_good) as rtt_dl_termeral_good,
+sum(rtt_dl_termeral_bat) as rtt_dl_termeral_bat,
+sum(n3_other_cnt) as n3_other_cnt,
+sum(http_request_cnt) as http_request_cnt,
+sum(http_succ_cnt) as http_succ_cnt,
+sum(http_respdelay) as http_respdelay,
+sum(http_respdelay_cnt) as http_respdelay_cnt,
+sum(tcp_send_delay) as tcp_send_delay,
+sum(tcp_send_delay_cnt) as tcp_send_delay_cnt,
+sum(tcp_receive_delay) as tcp_receive_delay,
+sum(tcp_receive_delay_cnt) as tcp_receive_delay_cnt,
+sum(f_packets_response_delay) as f_packets_response_delay,
+sum(f_packets_response_delay_cnt) as f_packets_response_delay_cnt,
+sum(dns_reply_delay) as dns_reply_delay,
+sum(dns_reply_delay_cnt) as dns_reply_delay_cnt,
+sum(first_tcp_pageopen_delay) as first_tcp_pageopen_delay,
+sum(first_tcp_pageopen_delay_cnt) as first_tcp_pageopen_delay_cnt,
+sum(first_screen_delay) as first_screen_delay,
+sum(first_screen_delay_cnt) as first_screen_delay_cnt,
+sum(first_screen_delaygood) as first_screen_delaygood,
+sum(first_screen_delaybad) as first_screen_delaybad,
+sum(f_packets_response_delaygood) as f_packets_response_delaygood,
+sum(f_packets_response_delaybad) as f_packets_response_delaybad,
+sum(pageopen_delaygood) as pageopen_delaygood,
+sum(pageopen_delaybad) as pageopen_delaybad,
+sum(http_dns_reply_delaygood) as http_dns_reply_delaygood,
+sum(http_dns_reply_delaybad) as http_dns_reply_delaybad,
+sum(connect_good) as connect_good,
+sum(connect_bad) as connect_bad,
+sum(n3_http_cnt) as n3_http_cnt,
+sum(video_throughput) as video_throughput,
+sum(video_throughput_cnt) as video_throughput_cnt,
+sum(video_bit_rate) as video_bit_rate,
+sum(video_bit_rate_cnt) as video_bit_rate_cnt,
+sum(video_cache_throughput) as video_cache_throughput,
+sum(video_cache_throughput_cnt) as video_cache_throughput_cnt,
+sum(video_halt_rate) as video_halt_rate,
+sum(video_haltr_ate_cnt) as video_haltr_ate_cnt,
+sum(video_avgspeed_good) as video_avgspeed_good,
+sum(video_avgspeed_bad) as video_avgspeed_bad,
+sum(videoplay_halt_good) as videoplay_halt_good,
+sum(videoplay_halt_bad) as videoplay_halt_bad,
+sum(n3_video_cnt) as n3_video_cnt,
+sum(request_cnt) as request_cnt,
+sum(dns_resp_succ_cnt) as dns_resp_succ_cnt,
+sum(n3_dns_cnt) as n3_dns_cnt,
+sum(game_udp_avg_total_delay) as game_udp_avg_total_delay,
+sum(game_udp_avg_total_delay_cnt) as game_udp_avg_total_delay_cnt,
+sum(duration) as duration,
+sum(total_data) as total_data,
+sum(n3_cnt) as n3_cnt,
+avg(f_packets_response_good_rat) as f_packets_response_good_rat,
+avg(http_dns_res_good_rat) as http_dns_res_good_rat,
+avg(page_open_good_rat) as page_open_good_rat,
+avg(page_screen_good_rat) as page_screen_good_rat,
+avg(im_good_rat) as im_good_rat,
+avg(game_good_rat) as game_good_rat,
+avg(vide_speed_good_rat) as vide_speed_good_rat,
+avg(vide_halt_good_rat) as vide_halt_good_rat,
+avg(http_service_good_rat) as http_service_good_rat,
+avg(vide_service_good_rat) as vide_service_good_rat,
+avg(rtt_ul_server_good_rat) as rtt_ul_server_good_rat,
+avg(rtt_dl_termeral_good_rat) as rtt_dl_termeral_good_rat,
+avg(rtt_service_good_rat) as rtt_service_good_rat,
+avg(case when  
+    weightedAverage(array(
+            (case WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+             (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+             ELSE 0 end),
+            0.7,
+            (case
+             WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+             (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+             ELSE 0 end),
+            0.3))>0 
+    or 
+    weightedAverage(array(
+            (case WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+             (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+             ELSE 0 end),
+            0.8,
+            (case
+             WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+             (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+             ELSE 0 end),
+            0.2))>0 
+    or 
+    (case WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+            (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+            ELSE 0 end)>0 
+    or 
+    (case WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+            (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+            ELSE 0 end)>0 
+then 
+    weightedAverage(array(
+       weightedAverage(array(
+        (case
+         WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+         (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+         ELSE 0 end),
+        0.7,
+        (case
+         WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+         (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+         ELSE 0 end),
+        0.3)),
+       0.4,
+       weightedAverage(array(
+        (case
+         WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+         (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+         ELSE 0 end),
+        0.8,
+        (case
+         WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+         (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+         ELSE 0 end),
+        0.2)),
+       0.35,
+       (case
+        WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+        (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+        ELSE 0 end),
+       0.15,
+       (case
+        WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+        (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+        ELSE 0 end),
+       0.1))
+       /
+       (if(weightedAverage(array(
+        (case
+         WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+         (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+         ELSE 0 end),
+        0.7,
+        (case
+         WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+         (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+         ELSE 0 end),
+        0.3))>0,0.4,0)
+        +
+        if(weightedAverage(array(
+        (case
+         WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+         (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+         ELSE 0 end),
+        0.8,
+        (case
+         WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+         (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+         ELSE 0 end),
+        0.2))>0,0.35,0)
+        +
+        if((case
+        WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+        (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+        ELSE 0 end)>0,0.15,0)
+        +
+        if((case
+        WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+        (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+        ELSE 0 end)>0,0.1,0)) 
+else null end) as service_perceive_good_rat,
+avg(tcp_send_avg_delay) as tcp_send_avg_delay,
+avg(tcp_receive_avg_delay) as tcp_receive_avg_delay,
+avg(tcp_avg_delay) as tcp_avg_delay,
+avg(game_conn_avg_delay) as game_conn_avg_delay,
+avg(http_dl_rate_avg_data) as http_dl_rate_avg_data,
+avg(http_ul_rate_avg_data) as http_ul_rate_avg_data,
+avg(first_tcp_pageopen_avg_delay) as first_tcp_pageopen_avg_delay,
+avg(first_screen_avg_delay) as first_screen_avg_delay,
+avg(video_throughput_rate) as video_throughput_rate,
+avg(video_cache_throughput_rate) as video_cache_throughput_rate,
+avg(video_halt_avg_rate) as video_halt_avg_rate,
+avg(video_rate_ratio) as video_rate_ratio,
+avg(f_packets_response_avg_delay) as f_packets_response_avg_delay,
+avg(dns_reply_avg_delay) as dns_reply_avg_delay,
+avg(dns_resp_succ_rate) as dns_resp_succ_rate,
+avg(udp_packetloss_rat) as udp_packetloss_rat,
+avg(http_avg_respdelay) as http_avg_respdelay,
+avg(http_service_success_rat) as http_service_success_rat,
+avg(game_udp_avg_delay) as game_udp_avg_delay,
+max(tac) as tac,
+max(ncgi_ecgi) as ncgi_ecgi
+from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_ohvd_sp_usrcell_ where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

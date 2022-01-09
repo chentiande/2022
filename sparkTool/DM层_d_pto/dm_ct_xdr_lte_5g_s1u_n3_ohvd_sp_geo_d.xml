@@ -1,0 +1,323 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_geo_d" period="1d"
+               desc="全国、大区、省、城市/业务大小类_用户面-4/5G话单-other/http/video/dns(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	 <tableName>tmp_dm_ct_xdr_lte_5g_s1u</tableName>
+<sql>
+<![CDATA[select 
+1.ne_type,
+app_id,
+app_name,
+1
+2.ne_type,
+city_id,
+bit_code_rate_good_rat,
+city_id（全国、大区、区域、城市维度，此指标为）,
+dl_download_good_rat,
+duration,
+f_packets_response_good_rat,
+game_good_rat,
+http_dns_res_good_rat,
+http_service_good_rat,
+im_good_rat,
+imsi_cnt,
+n3_cnt,
+page_open_good_rat,
+page_screen_good_rat,
+province_id
+3.ne_type,
+province_id（全国维度，此指标为）,
+province_name（全国维度，此指标为）,
+region_id
+4.ne_type,
+region_id（全国、大区、区域维度，此指标为）,
+region_name（全国、大区、区域维度，此指标为）,
+rtt_dl_termeral_good_rat,
+rtt_service_good_rat,
+rtt_ul_server_good_rat,
+service_perceive_good_rat,
+starttime,
+sub_app_id,
+sub_app_name,
+total_data,
+tran_service_good_rate,
+ul_upload_good_rat,
+vide_halt_good_rat,
+vide_service_good_rat,
+vide_speed_good_rat,
+赋值,
+city_name（全国、大区、区域、城市维度，此指标为）,
+（根据dm表的间汇总维度手工填写）
+1277:全国
+1278:大区
+1279:城市
+1280:区县
+ from ${source_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_city_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+1.ne_type,
+app_id,
+app_name,
+1
+2.ne_type,
+city_id,
+bit_code_rate_good_rat,
+0 as city_id（全国、大区、区域、城市维度，此指标为）,
+dl_download_good_rat,
+duration,
+f_packets_response_good_rat,
+game_good_rat,
+http_dns_res_good_rat,
+http_service_good_rat,
+im_good_rat,
+imsi_cnt,
+n3_cnt,
+page_open_good_rat,
+page_screen_good_rat,
+province_id
+3.ne_type,
+province_id（全国维度，此指标为）,
+province_name（全国维度，此指标为）,
+region_id
+4.ne_type,
+region_id（全国、大区、区域维度，此指标为）,
+region_name（全国、大区、区域维度，此指标为）,
+rtt_dl_termeral_good_rat,
+rtt_service_good_rat,
+rtt_ul_server_good_rat,
+service_perceive_good_rat,
+starttime,
+sub_app_id,
+sub_app_name,
+total_data,
+tran_service_good_rate,
+ul_upload_good_rat,
+vide_halt_good_rat,
+vide_service_good_rat,
+vide_speed_good_rat,
+赋值,
+0 as city_name（全国、大区、区域、城市维度，此指标为）,
+（根据dm表的间汇总维度手工填写）
+1277:全国
+1278:大区
+1279:城市
+1280:区县
+ from ${source_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_region_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+1.ne_type,
+app_id,
+app_name,
+1
+2.ne_type,
+city_id,
+bit_code_rate_good_rat,
+0 as city_id（全国、大区、区域、城市维度，此指标为）,
+dl_download_good_rat,
+duration,
+f_packets_response_good_rat,
+game_good_rat,
+http_dns_res_good_rat,
+http_service_good_rat,
+im_good_rat,
+imsi_cnt,
+n3_cnt,
+page_open_good_rat,
+page_screen_good_rat,
+province_id
+3.ne_type,
+province_id（全国维度，此指标为）,
+province_name（全国维度，此指标为）,
+region_id
+4.ne_type,
+0 as region_id（全国、大区、区域维度，此指标为）,
+0 as region_name（全国、大区、区域维度，此指标为）,
+rtt_dl_termeral_good_rat,
+rtt_service_good_rat,
+rtt_ul_server_good_rat,
+service_perceive_good_rat,
+starttime,
+sub_app_id,
+sub_app_name,
+total_data,
+tran_service_good_rate,
+ul_upload_good_rat,
+vide_halt_good_rat,
+vide_service_good_rat,
+vide_speed_good_rat,
+赋值,
+0 as city_name（全国、大区、区域、城市维度，此指标为）,
+（根据dm表的间汇总维度手工填写）
+1277:全国
+1278:大区
+1279:城市
+1280:区县
+ from ${source_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_area_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+1.ne_type,
+app_id,
+app_name,
+1
+2.ne_type,
+city_id,
+bit_code_rate_good_rat,
+0 as city_id（全国、大区、区域、城市维度，此指标为）,
+dl_download_good_rat,
+duration,
+f_packets_response_good_rat,
+game_good_rat,
+http_dns_res_good_rat,
+http_service_good_rat,
+im_good_rat,
+imsi_cnt,
+n3_cnt,
+page_open_good_rat,
+page_screen_good_rat,
+province_id
+3.ne_type,
+province_id（全国维度，此指标为）,
+province_name（全国维度，此指标为）,
+region_id
+4.ne_type,
+0 as region_id（全国、大区、区域维度，此指标为）,
+0 as region_name（全国、大区、区域维度，此指标为）,
+rtt_dl_termeral_good_rat,
+rtt_service_good_rat,
+rtt_ul_server_good_rat,
+service_perceive_good_rat,
+starttime,
+sub_app_id,
+sub_app_name,
+total_data,
+tran_service_good_rate,
+ul_upload_good_rat,
+vide_halt_good_rat,
+vide_service_good_rat,
+vide_speed_good_rat,
+赋值,
+0 as city_name（全国、大区、区域、城市维度，此指标为）,
+（根据dm表的间汇总维度手工填写）
+1277:全国
+1278:大区
+1279:城市
+1280:区县
+ from ${source_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_prov_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+1.ne_type,
+app_id,
+app_name,
+1
+2.ne_type,
+city_id,
+bit_code_rate_good_rat,
+0 as city_id（全国、大区、区域、城市维度，此指标为）,
+dl_download_good_rat,
+duration,
+f_packets_response_good_rat,
+game_good_rat,
+http_dns_res_good_rat,
+http_service_good_rat,
+im_good_rat,
+imsi_cnt,
+n3_cnt,
+page_open_good_rat,
+page_screen_good_rat,
+province_id
+3.ne_type,
+0 as province_id（全国维度，此指标为）,
+0 as province_name（全国维度，此指标为）,
+region_id
+4.ne_type,
+0 as region_id（全国、大区、区域维度，此指标为）,
+0 as region_name（全国、大区、区域维度，此指标为）,
+rtt_dl_termeral_good_rat,
+rtt_service_good_rat,
+rtt_ul_server_good_rat,
+service_perceive_good_rat,
+starttime,
+sub_app_id,
+sub_app_name,
+total_data,
+tran_service_good_rate,
+ul_upload_good_rat,
+vide_halt_good_rat,
+vide_service_good_rat,
+vide_speed_good_rat,
+赋值,
+0 as city_name（全国、大区、区域、城市维度，此指标为）,
+（根据dm表的间汇总维度手工填写）
+1277:全国
+1278:大区
+1279:城市
+1280:区县
+ from ${source_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_cy_
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ 	]]>
+		</sql>
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_geo_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+1.ne_type=1277,赋值 1
+2.ne_type=1278,赋值 province_id
+3.ne_type=1279,赋值 region_id
+4.ne_type=1280,赋值 city_id as geo_id,
+（根据dm表的空间汇总维度手工填写）
+1277:全国
+1278:大区
+1279:城市
+1280:区县 as ne_type,
+province_id（全国维度，此指标为空） as province_id,
+province_name（全国维度，此指标为空） as province_name,
+'' as area_id,
+'' as area_name,
+region_id（全国、大区、区域维度，此指标为空） as region_id,
+region_name（全国、大区、区域维度，此指标为空） as region_name,
+city_id（全国、大区、区域、城市维度，此指标为空） as city_id,
+city_name（全国、大区、区域、城市维度，此指标为空） as city_name,
+app_id as app_id,
+max(app_name) as app_name,
+sub_app_id as sub_app_id,
+max(sub_app_name) as sub_app_name,
+imsi_cnt as imsi_cnt,
+duration as duration,
+n3_cnt as n3_cnt,
+total_data as total_data,
+f_packets_response_good_rat as f_packets_response_good_rat,
+http_dns_res_good_rat as http_dns_res_good_rat,
+page_open_good_rat as page_open_good_rat,
+page_screen_good_rat as page_screen_good_rat,
+im_good_rat as im_good_rat,
+game_good_rat as game_good_rat,
+vide_speed_good_rat as vide_speed_good_rat,
+vide_halt_good_rat as vide_halt_good_rat,
+bit_code_rate_good_rat as bit_code_rate_good_rat,
+http_service_good_rat as http_service_good_rat,
+vide_service_good_rat as vide_service_good_rat,
+rtt_ul_server_good_rat as rtt_ul_server_good_rat,
+rtt_dl_termeral_good_rat as rtt_dl_termeral_good_rat,
+rtt_service_good_rat as rtt_service_good_rat,
+ul_upload_good_rat as ul_upload_good_rat,
+dl_download_good_rat as dl_download_good_rat,
+tran_service_good_rate as tran_service_good_rate,
+service_perceive_good_rat as service_perceive_good_rat
+from tmp_dm_ct_xdr_lte_5g_s1u
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

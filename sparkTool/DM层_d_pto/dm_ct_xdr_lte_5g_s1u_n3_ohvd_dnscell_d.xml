@@ -1,0 +1,97 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_ohvd_dnscell_d" period="1d"
+               desc="小区-4/5G话单-OTHER/HTTP/VIDEO/DNS/S1MME-单小区定界定段-DNS(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	 <tableName>tmp_dm_ct_xdr_lte_5g_s1u</tableName>
+<sql>
+<![CDATA[select 
+00:00:00,
+23:59:59,
+00:00:00~2020,
+0 as abnormal_flag,
+0 as abnormal_msisdn_num,
+abnormal_record_num,
+dns_reply_delaybad,
+dns_reply_delaygood,
+dns_resp_fail_cnt,
+dns_resp_req_cnt,
+0 as msisdn_num,
+nci_eci,
+province_id,
+province_name,
+query_domain_name,
+starttime,
+total_data,
+total_duration,
+total_record_num,
+例原话单为2020,
+开始时间为2020,
+abnormal_record_rate
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_dns_delimitcell_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+00:00:00,
+23:59:59,
+00:00:00~2020,
+abnormal_flag,
+abnormal_msisdn_num,
+0 as abnormal_record_num,
+dns_reply_delaybad,
+dns_reply_delaygood,
+dns_resp_fail_cnt,
+dns_resp_req_cnt,
+msisdn_num,
+0 as nci_eci,
+province_id,
+province_name,
+query_domain_name,
+starttime,
+total_data,
+total_duration,
+total_record_num,
+例原话单为2020,
+开始时间为2020,
+abnormal_record_rate
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_dns_delimit_
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ 	]]>
+		</sql>
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_dnscell_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+nci_eci as nci_eci,
+query_domain_name as query_domain_name,
+(case when sum(nvl(abnormal_record_num,0))>0 then (nvl(abnormal_record_num,0))/sum(nvl(abnormal_record_num,0)) else 0 end) as dns_total_record_abnormal_top_rate,
+total_duration as dns_total_duration,
+total_data as dns_total_data,
+total_record_num as dns_total_record_num,
+abnormal_record_rate as dns_abnormal_record_rate,
+abnormal_flag as dns_abnormal_flag,
+msisdn_num as dns_msisdn_num,
+abnormal_msisdn_num as dns_abnormal_msisdn_num,
+(case when nvl(dns_resp_req_cnt,0)>0 then (nvl(dns_resp_fail_cnt,0))/(nvl(dns_resp_req_cnt,0)) else 0 end) as dns_resp_fail_abnormal_rate,
+(case when nvl(dns_reply_delaygood+dns_reply_delaybad,0)>0 then (nvl(dns_reply_delaybad,0))/(nvl(dns_reply_delaygood+dns_reply_delaybad,0)) else 0 end) as dns_reply_delay_abnormal_rate,
+total_duration as dnscell_total_duration,
+total_data as dnscell_total_data,
+total_record_num as dnscell_total_record_num,
+abnormal_record_rate as dnscell_abnormal_record_rate,
+(case when nvl(dns_resp_req_cnt,0)>0 then (nvl(dns_resp_fail_cnt,0))/(nvl(dns_resp_req_cnt,0)) else 0 end) as dnscell_resp_fail_abnormal_rate,
+(case when nvl(dns_reply_delaygood+dns_reply_delaybad,0)>0 then (nvl(dns_reply_delaybad,0))/(nvl(dns_reply_delaygood+dns_reply_delaybad,0)) else 0 end) as dnscell_reply_delay_abnormal_rate
+from tmp_dm_ct_xdr_lte_5g_s1u
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

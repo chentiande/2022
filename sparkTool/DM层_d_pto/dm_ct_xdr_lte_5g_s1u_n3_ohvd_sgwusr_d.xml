@@ -1,0 +1,124 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_ohvd_sgwusr_d" period="1d"
+               desc="大区/用户-4/5G话单-OTHER/HTTP/VIDEO/DNS/S1MME-单用户定界定段-SGW(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	 <tableName>tmp_dm_ct_xdr_lte_5g_s1u</tableName>
+<sql>
+<![CDATA[select 
+00:00:00,
+23:59:59,
+00:00:00~2020,
+0 as abnormal_flag,
+0 as abnormal_msisdn_num,
+abnormal_record_num,
+chkhand_bad,
+chkhand_good,
+abnormal_record_rate,
+http_dns_reply_delaybad,
+msisdn,
+0 as msisdn_num,
+pageopen_delaybad,
+pageopen_delaygood,
+province_id,
+province_name,
+rtt_dl_termeral_bat,
+rtt_dl_termeral_good,
+rtt_ul_server_bat,
+rtt_ul_server_good,
+sgw_upf_ip,
+sgw_upf_name,
+starttime,
+total_data,
+total_duration,
+total_record_num,
+video_avgspeed_bad,
+video_avgspeed_good,
+例原话单为2020,
+开始时间为2020,
+http_dns_reply_delaygood
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_ohv_sgwusr_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+00:00:00,
+23:59:59,
+00:00:00~2020,
+abnormal_flag,
+abnormal_msisdn_num,
+0 as abnormal_record_num,
+chkhand_bad,
+chkhand_good,
+abnormal_record_rate,
+http_dns_reply_delaybad,
+0 as msisdn,
+msisdn_num,
+pageopen_delaybad,
+pageopen_delaygood,
+province_id,
+province_name,
+rtt_dl_termeral_bat,
+rtt_dl_termeral_good,
+rtt_ul_server_bat,
+rtt_ul_server_good,
+sgw_upf_ip,
+sgw_upf_name,
+starttime,
+total_data,
+total_duration,
+total_record_num,
+video_avgspeed_bad,
+video_avgspeed_good,
+例原话单为2020,
+开始时间为2020,
+http_dns_reply_delaygood
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_ohv_sgw_
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ 	]]>
+		</sql>
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sgwusr_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+msisdn as msisdn,
+sgw_upf_ip as sgw_upf_ip,
+max(sgw_upf_name) as sgw_upf_name,
+(case when sum(nvl(abnormal_record_num,0))>0 then (nvl(abnormal_record_num,0))/sum(nvl(abnormal_record_num,0)) else 0 end) as sgw_total_record_abnormal_top_rate,
+total_duration as sgw_total_duration,
+total_data as sgw_total_data,
+total_record_num as sgw_total_record_num,
+abnormal_record_rate as sgw_abnormal_record_rate,
+abnormal_flag as sgw_abnormal_flag,
+msisdn_num as sgw_msisdn_num,
+abnormal_msisdn_num as sgw_abnormal_msisdn_num,
+(case when nvl(rtt_ul_server_good+rtt_ul_server_bat,0)>0 then (nvl(rtt_ul_server_bat,0))/(nvl(rtt_ul_server_good+rtt_ul_server_bat,0)) else 0 end) as sgw_ul_rtt_delay_abnormal_rate,
+(case when nvl(rtt_dl_termeral_good+rtt_dl_termeral_bat,0)>0 then (nvl(rtt_dl_termeral_bat,0))/(nvl(rtt_dl_termeral_good+rtt_dl_termeral_bat,0)) else 0 end) as sgw_dl_rtt_delay_abnormal_rate,
+(case when nvl(pageopen_delaygood+pageopen_delaybad,0)>0 then (nvl(pageopen_delaybad,0))/(nvl(pageopen_delaygood+pageopen_delaybad,0)) else 0 end) as sgw_webpage_delay_abnormal_rate,
+(case when nvl(video_avgspeed_good+video_avgspeed_bad,0)>0 then (nvl(video_avgspeed_bad,0))/(nvl(video_avgspeed_good+video_avgspeed_bad,0)) else 0 end) as sgw_video_download_abnormal_rate,
+(case when nvl(chkhand_good+chkhand_bad,0)>0 then (nvl(chkhand_bad,0))/(nvl(chkhand_good+chkhand_bad,0)) else 0 end) as sgw_game_chkhand_abnormal_rate,
+(case when nvl(http_dns_reply_delaygood+http_dns_reply_delaybad,0)>0 then (nvl(http_dns_reply_delaybad,0))/(nvl(http_dns_reply_delaygood+http_dns_reply_delaybad,0)) else 0 end) as sgw_dns_resp_abnormal_rate,
+total_duration as sgwusr_total_duration,
+total_data as sgwusr_total_data,
+total_record_num as sgwusr_total_record_num,
+abnormal_record_rate as sgwusr_abnormal_record_rate,
+(case when nvl(rtt_ul_server_good+rtt_ul_server_bat,0)>0 then (nvl(rtt_ul_server_bat,0))/(nvl(rtt_ul_server_good+rtt_ul_server_bat,0)) else 0 end) as sgwusr_ul_rtt_delay_abnormal_rate,
+(case when nvl(rtt_dl_termeral_good+rtt_dl_termeral_bat,0)>0 then (nvl(rtt_dl_termeral_bat,0))/(nvl(rtt_dl_termeral_good+rtt_dl_termeral_bat,0)) else 0 end) as sgwusr_dl_rtt_delay_abnormal_rate,
+(case when nvl(pageopen_delaygood+pageopen_delaybad,0)>0 then (nvl(pageopen_delaybad,0))/(nvl(pageopen_delaygood+pageopen_delaybad,0)) else 0 end) as sgwusr_webpage_delay_abnormal_rate,
+(case when nvl(video_avgspeed_good+video_avgspeed_bad,0)>0 then (nvl(video_avgspeed_bad,0))/(nvl(video_avgspeed_good+video_avgspeed_bad,0)) else 0 end) as sgwusr_video_download_abnormal_rate,
+(case when nvl(chkhand_good+chkhand_bad,0)>0 then (nvl(chkhand_bad,0))/(nvl(chkhand_good+chkhand_bad,0)) else 0 end) as sgwusr_game_chkhand_abnormal_rate,
+(case when nvl(http_dns_reply_delaygood+http_dns_reply_delaybad,0)>0 then (nvl(http_dns_reply_delaybad,0))/(nvl(http_dns_reply_delaygood+http_dns_reply_delaybad,0)) else 0 end) as sgwusr_dns_resp_abnormal_rate
+from tmp_dm_ct_xdr_lte_5g_s1u
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

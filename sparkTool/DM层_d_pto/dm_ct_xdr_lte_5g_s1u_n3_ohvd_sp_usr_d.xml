@@ -1,0 +1,88 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_usr_d" period="1d"
+               desc="用户/SP_DM层公共宽表_用户面-4/5G话单-other/http/video/dns-业务指标(1天)">
+      <functions>
+	<function>weightedAverage</function>
+  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_sp_usr_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(imsi_supi) as imsi_supi,
+msisdn as msisdn,
+app_id as app_id,
+max(app_name) as app_name,
+sub_app_id as sub_app_id,
+max(sub_app_name) as sub_app_name,
+sum(duration) as duration,
+sum(n3_cnt) as n3_cnt,
+sum(total_data) as total_data,
+(case when (sum(nvl(f_packets_response_delaygood,0))+sum(nvl(f_packets_response_delaybad,0)))>0 then (sum(nvl(f_packets_response_delaygood,0)))/(sum(nvl(f_packets_response_delaygood,0))+sum(nvl(f_packets_response_delaybad,0))) else 0 end) as f_packets_response_good_rat,
+(case when (sum(nvl(http_dns_reply_delaygood,0))+sum(nvl(http_dns_reply_delaybad,0)))>0 then (sum(nvl(http_dns_reply_delaygood,0)))/(sum(nvl(http_dns_reply_delaygood,0))+sum(nvl(http_dns_reply_delaybad,0))) else 0 end) as http_dns_res_good_rat,
+(case when (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 then (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0))) else 0 end) as page_open_good_rat,
+(case when (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 then (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0))) else 0 end) as page_screen_good_rat,
+(case when (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 then (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0))) else 0 end) as im_good_rat,
+(case when (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 then (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0))) else 0 end) as game_good_rat,
+(case when (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 then (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0))) else 0 end) as vide_speed_good_rat,
+(case when (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 then (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0))) else 0 end) as vide_halt_good_rat,
+(case when (sum(nvl(videobit_code_good,0))+sum(nvl(videobit_code_bad,0)))>0 then (sum(nvl(videobit_code_good,0)))/(sum(nvl(videobit_code_good,0))+sum(nvl(videobit_code_bad,0))) else 0 end) as bit_code_rate_good_rat,
+weightedAverage(array((case when (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 then (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0))) else 0 end),0.7 , (case when (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 then (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0))) else 0 end),0.3)) as http_service_good_rat,
+weightedAverage(array((case when (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 then (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0))) else 0 end),0.8 , (case when (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 then (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0))) else 0 end),0.2)) as vide_service_good_rat,
+(case when (sum(nvl(rtt_ul_server_good,0))+sum(nvl(rtt_ul_server_bat,0)))>0 then (sum(nvl(rtt_ul_server_good,0)))/(sum(nvl(rtt_ul_server_good,0))+sum(nvl(rtt_ul_server_bat,0))) else 0 end) as rtt_ul_server_good_rat,
+(case when (sum(nvl(rtt_dl_termeral_good,0))+sum(nvl(rtt_dl_termeral_bat,0)))>0 then (sum(nvl(rtt_dl_termeral_good,0)))/(sum(nvl(rtt_dl_termeral_good,0))+sum(nvl(rtt_dl_termeral_bat,0))) else 0 end) as rtt_dl_termeral_good_rat,
+weightedAverage(array((case when (sum(nvl(rtt_ul_server_good,0))+sum(nvl(rtt_ul_server_bat,0)))>0 then (sum(nvl(rtt_ul_server_good,0)))/(sum(nvl(rtt_ul_server_good,0))+sum(nvl(rtt_ul_server_bat,0))) else 0 end), 0.3, (case when (sum(nvl(rtt_dl_termeral_good,0))+sum(nvl(rtt_dl_termeral_bat,0)))>0 then (sum(nvl(rtt_dl_termeral_good,0)))/(sum(nvl(rtt_dl_termeral_good,0))+sum(nvl(rtt_dl_termeral_bat,0))) else 0 end),0.7)) as rtt_service_good_rat,
+(case when (sum(nvl(ul_upload_good,0))+sum(nvl(ul_upload_bat,0)))>0 then (sum(nvl(ul_upload_good,0)))/(sum(nvl(ul_upload_good,0))+sum(nvl(ul_upload_bat,0))) else 0 end) as ul_upload_good_rat,
+(case when (sum(nvl(dl_download_good,0))+sum(nvl(dl_download_bat,0)))>0 then (sum(nvl(dl_download_good,0)))/(sum(nvl(dl_download_good,0))+sum(nvl(dl_download_bat,0))) else 0 end) as dl_download_good_rat,
+weightedAverage(array(
+                                                (case
+                                                        when (sum(nvl(ul_upload_good,0))+sum(nvl(ul_upload_bat,0)))>0
+                                                                then (sum(nvl(ul_upload_good,0)))/(sum(nvl(ul_upload_good,0))+sum(nvl(ul_upload_bat,0))) else 0 end),
+                                                0.5,
+                                                (case
+                                                 when (sum(nvl(dl_download_good,0))+sum(nvl(dl_download_bat,0)))>0
+                                                                then (sum(nvl(dl_download_good,0)))/(sum(nvl(dl_download_good,0))+sum(nvl(dl_download_bat,0))) else 0 end),
+                                         0.5)) as tran_service_good_rate,
+case when app_id=19 then 
+          weightedAverage(array(
+            (case WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+             (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+             ELSE 0 end),
+            0.7,
+            (case
+             WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+             (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+             ELSE 0 end),
+            0.3))
+     when app_id=2 then 
+          weightedAverage(array(
+            (case WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+             (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+             ELSE 0 end),
+            0.8,
+            (case
+             WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+             (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+             ELSE 0 end),
+            0.2))
+     when app_id=1 then 
+          (case WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+            (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+            ELSE 0 end)
+     when app_id=5 then 
+          (case WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+            (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+            ELSE 0 end) else null end as service_perceive_good_rat
+from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_ohvd_sp_usrcity_ where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

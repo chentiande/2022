@@ -1,0 +1,660 @@
+<AggrSqlConfig topicId="dm_ct_xdr_lte_5g_s1u_n3_ohvd_usr_d" period="1d"
+               desc="端到端用户_用户面-4/5G话单-other/http/video/dns(1天)">
+      <functions>
+	<function>weightedAverage</function>
+  </functions>
+
+    <tempTables>
+	 <tableName>tmp_dm_ct_xdr_lte_5g_s1u</tableName>
+<sql>
+<![CDATA[select 
+
+,
+
+else,
+
+then,
+00:00:00,
+ELSE,
+THEN
+,
+WHEN,
+00:00:00~2020,
+case
+,
+chkhand_bad,
+chkhand_good,
+connect_bad,
+connect_good,
+dim_1,
+dim_2,
+dim_3,
+dim_4,
+dim_5,
+0 as abnormal_flag,
+0 as dl_download_bat,
+0 as dl_download_good,
+0 as dns_reply_delaybad,
+0 as dns_reply_delaygood,
+0 as dns_resp_fail_cnt,
+0 as dns_resp_succ_cnt,
+duration,
+first_screen_delaybad,
+first_screen_delaygood,
+0 as http_dns_reply_delaybad,
+0 as http_dns_reply_delaygood,
+if,
+imei_pei,
+imei_pei_i_os,
+imei_pei_model_name,
+imei_pei_tac,
+imei_pei_term_type,
+imei_pei_vendor_name,
+msisdn,
+0 as n3_dns_cnt,
+n3_http_abnormal_cnt,
+n3_http_cnt,
+n3_other_abnormal_cnt,
+n3_other_cnt,
+n3_video_abnormal_cnt,
+n3_video_cnt,
+null,
+or,
+pageopen_delaybad,
+pageopen_delaygood,
+province_id,
+province_name,
+rtt_dl_termeral_bat,
+rtt_dl_termeral_good,
+rtt_ul_server_bat,
+rtt_ul_server_good,
+0 as service_perceive_good_rat,
+starttime,
+total_data,
+dl_packet_loss_rate_bat_cnt,
+video_avgspeed_bad,
+video_avgspeed_good,
+0 as videobit_code_bad,
+0 as videobit_code_good,
+videoplay_halt_bad,
+videoplay_halt_good,
+例原话单为2020,
+ul_packet_loss_rate_bat_cnt,
+开始时间为2020,
+判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_other_term_usrcity_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+
+,
+
+else,
+
+then,
+00:00:00,
+ELSE,
+THEN
+,
+WHEN,
+00:00:00~2020,
+case
+,
+chkhand_bad,
+chkhand_good,
+connect_bad,
+connect_good,
+dim_1,
+dim_2,
+dim_3,
+dim_4,
+dim_5,
+0 as abnormal_flag,
+dl_download_bat,
+dl_download_good,
+0 as dns_reply_delaybad,
+0 as dns_reply_delaygood,
+0 as dns_resp_fail_cnt,
+0 as dns_resp_succ_cnt,
+duration,
+first_screen_delaybad,
+first_screen_delaygood,
+http_dns_reply_delaybad,
+http_dns_reply_delaygood,
+if,
+imei_pei,
+imei_pei_i_os,
+imei_pei_model_name,
+imei_pei_tac,
+imei_pei_term_type,
+imei_pei_vendor_name,
+msisdn,
+0 as n3_dns_cnt,
+n3_http_abnormal_cnt,
+n3_http_cnt,
+n3_other_abnormal_cnt,
+n3_other_cnt,
+n3_video_abnormal_cnt,
+n3_video_cnt,
+null,
+or,
+pageopen_delaybad,
+pageopen_delaygood,
+province_id,
+province_name,
+rtt_dl_termeral_bat,
+rtt_dl_termeral_good,
+rtt_ul_server_bat,
+rtt_ul_server_good,
+0 as service_perceive_good_rat,
+starttime,
+total_data,
+dl_packet_loss_rate_bat_cnt,
+video_avgspeed_bad,
+video_avgspeed_good,
+0 as videobit_code_bad,
+0 as videobit_code_good,
+videoplay_halt_bad,
+videoplay_halt_good,
+例原话单为2020,
+ul_packet_loss_rate_bat_cnt,
+开始时间为2020,
+判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_http_term_usrcity_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+
+,
+
+else,
+
+then,
+00:00:00,
+ELSE,
+THEN
+,
+WHEN,
+00:00:00~2020,
+case
+,
+chkhand_bad,
+chkhand_good,
+connect_bad,
+connect_good,
+dim_1,
+dim_2,
+dim_3,
+dim_4,
+dim_5,
+0 as abnormal_flag,
+0 as dl_download_bat,
+0 as dl_download_good,
+0 as dns_reply_delaybad,
+0 as dns_reply_delaygood,
+0 as dns_resp_fail_cnt,
+0 as dns_resp_succ_cnt,
+duration,
+first_screen_delaybad,
+first_screen_delaygood,
+0 as http_dns_reply_delaybad,
+0 as http_dns_reply_delaygood,
+if,
+imei_pei,
+imei_pei_i_os,
+imei_pei_model_name,
+imei_pei_tac,
+imei_pei_term_type,
+imei_pei_vendor_name,
+msisdn,
+0 as n3_dns_cnt,
+n3_http_abnormal_cnt,
+n3_http_cnt,
+n3_other_abnormal_cnt,
+n3_other_cnt,
+n3_video_abnormal_cnt,
+n3_video_cnt,
+null,
+or,
+pageopen_delaybad,
+pageopen_delaygood,
+province_id,
+province_name,
+rtt_dl_termeral_bat,
+rtt_dl_termeral_good,
+rtt_ul_server_bat,
+rtt_ul_server_good,
+0 as service_perceive_good_rat,
+starttime,
+total_data,
+dl_packet_loss_rate_bat_cnt,
+video_avgspeed_bad,
+video_avgspeed_good,
+videobit_code_bad,
+videobit_code_good,
+videoplay_halt_bad,
+videoplay_halt_good,
+例原话单为2020,
+ul_packet_loss_rate_bat_cnt,
+开始时间为2020,
+判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_video_term_usrcity_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+
+,
+
+else,
+
+then,
+00:00:00,
+ELSE,
+THEN
+,
+WHEN,
+00:00:00~2020,
+case
+,
+chkhand_bad,
+chkhand_good,
+connect_bad,
+connect_good,
+dim_1,
+dim_2,
+dim_3,
+dim_4,
+dim_5,
+0 as abnormal_flag,
+0 as dl_download_bat,
+0 as dl_download_good,
+dns_reply_delaybad,
+dns_reply_delaygood,
+dns_resp_fail_cnt,
+dns_resp_succ_cnt,
+0 as duration,
+first_screen_delaybad,
+first_screen_delaygood,
+0 as http_dns_reply_delaybad,
+0 as http_dns_reply_delaygood,
+if,
+imei_pei,
+imei_pei_i_os,
+imei_pei_model_name,
+imei_pei_tac,
+imei_pei_term_type,
+imei_pei_vendor_name,
+msisdn,
+n3_dns_cnt,
+0 as n3_http_abnormal_cnt,
+0 as n3_http_cnt,
+0 as n3_other_abnormal_cnt,
+0 as n3_other_cnt,
+0 as n3_video_abnormal_cnt,
+0 as n3_video_cnt,
+null,
+or,
+pageopen_delaybad,
+pageopen_delaygood,
+province_id,
+province_name,
+0 as rtt_dl_termeral_bat,
+0 as rtt_dl_termeral_good,
+0 as rtt_ul_server_bat,
+0 as rtt_ul_server_good,
+0 as service_perceive_good_rat,
+starttime,
+0 as total_data,
+0 as dl_packet_loss_rate_bat_cnt,
+video_avgspeed_bad,
+video_avgspeed_good,
+0 as videobit_code_bad,
+0 as videobit_code_good,
+videoplay_halt_bad,
+videoplay_halt_good,
+例原话单为2020,
+0 as ul_packet_loss_rate_bat_cnt,
+开始时间为2020,
+判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_dns_term_usrcity_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+0 as 
+,
+0 as 
+else,
+0 as 
+then,
+00:00:00,
+0 as ELSE,
+0 as THEN
+,
+0 as WHEN,
+00:00:00~2020,
+0 as case
+,
+0 as chkhand_bad,
+0 as chkhand_good,
+0 as connect_bad,
+0 as connect_good,
+0 as dim_1,
+0 as dim_2,
+0 as dim_3,
+0 as dim_4,
+0 as dim_5,
+abnormal_flag,
+0 as dl_download_bat,
+0 as dl_download_good,
+0 as dns_reply_delaybad,
+0 as dns_reply_delaygood,
+0 as dns_resp_fail_cnt,
+0 as dns_resp_succ_cnt,
+0 as duration,
+0 as first_screen_delaybad,
+0 as first_screen_delaygood,
+0 as http_dns_reply_delaybad,
+0 as http_dns_reply_delaygood,
+0 as if,
+0 as imei_pei,
+0 as imei_pei_i_os,
+0 as imei_pei_model_name,
+0 as imei_pei_tac,
+0 as imei_pei_term_type,
+0 as imei_pei_vendor_name,
+0 as msisdn,
+0 as n3_dns_cnt,
+0 as n3_http_abnormal_cnt,
+0 as n3_http_cnt,
+0 as n3_other_abnormal_cnt,
+0 as n3_other_cnt,
+0 as n3_video_abnormal_cnt,
+0 as n3_video_cnt,
+0 as null,
+0 as or,
+0 as pageopen_delaybad,
+0 as pageopen_delaygood,
+0 as province_id,
+0 as province_name,
+0 as rtt_dl_termeral_bat,
+0 as rtt_dl_termeral_good,
+0 as rtt_ul_server_bat,
+0 as rtt_ul_server_good,
+service_perceive_good_rat,
+starttime,
+0 as total_data,
+0 as dl_packet_loss_rate_bat_cnt,
+0 as video_avgspeed_bad,
+0 as video_avgspeed_good,
+0 as videobit_code_bad,
+0 as videobit_code_good,
+0 as videoplay_halt_bad,
+0 as videoplay_halt_good,
+例原话单为2020,
+0 as ul_packet_loss_rate_bat_cnt,
+开始时间为2020,
+0 as 判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0,
+0 as 比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期
+ from ${source_db}.dw_ct_xdr_lte_5g_s1u_n3_ohv_term_d
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ union all
+ select
+0 as 
+,
+0 as 
+else,
+0 as 
+then,
+00:00:00,
+0 as ELSE,
+0 as THEN
+,
+0 as WHEN,
+00:00:00~2020,
+0 as case
+,
+0 as chkhand_bad,
+0 as chkhand_good,
+0 as connect_bad,
+0 as connect_good,
+0 as dim_1,
+0 as dim_2,
+0 as dim_3,
+0 as dim_4,
+0 as dim_5,
+0 as abnormal_flag,
+0 as dl_download_bat,
+0 as dl_download_good,
+0 as dns_reply_delaybad,
+0 as dns_reply_delaygood,
+0 as dns_resp_fail_cnt,
+0 as dns_resp_succ_cnt,
+0 as duration,
+0 as first_screen_delaybad,
+0 as first_screen_delaygood,
+0 as http_dns_reply_delaybad,
+0 as http_dns_reply_delaygood,
+0 as if,
+0 as imei_pei,
+0 as imei_pei_i_os,
+0 as imei_pei_model_name,
+0 as imei_pei_tac,
+0 as imei_pei_term_type,
+0 as imei_pei_vendor_name,
+0 as msisdn,
+0 as n3_dns_cnt,
+0 as n3_http_abnormal_cnt,
+0 as n3_http_cnt,
+0 as n3_other_abnormal_cnt,
+0 as n3_other_cnt,
+0 as n3_video_abnormal_cnt,
+0 as n3_video_cnt,
+0 as null,
+0 as or,
+0 as pageopen_delaybad,
+0 as pageopen_delaygood,
+0 as province_id,
+0 as province_name,
+0 as rtt_dl_termeral_bat,
+0 as rtt_dl_termeral_good,
+0 as rtt_ul_server_bat,
+0 as rtt_ul_server_good,
+0 as service_perceive_good_rat,
+starttime,
+0 as total_data,
+0 as dl_packet_loss_rate_bat_cnt,
+0 as video_avgspeed_bad,
+0 as video_avgspeed_good,
+0 as videobit_code_bad,
+0 as videobit_code_good,
+0 as videoplay_halt_bad,
+0 as videoplay_halt_good,
+例原话单为2020,
+0 as ul_packet_loss_rate_bat_cnt,
+开始时间为2020,
+0 as 判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例,
+比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0,
+比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期
+ from ${source_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_usr_
+where p_date>='${p_date_start}' and p_date<'${p_date_end}'
+ 	]]>
+		</sql>
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_xdr_lte_5g_s1u_n3_ohvd_usr_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+max(province_id) as province_id,
+max(province_name) as province_name,
+msisdn as msisdn,
+max(置空) as imsi_supi,
+max(imei_pei) as imei_pei,
+max(imei_pei_tac) as imei_pei_tac,
+max(imei_pei_vendor_name) as imei_pei_vendor_name,
+max(imei_pei_model_name) as imei_pei_model_name,
+max(imei_pei_i_os) as imei_pei_i_os,
+max(imei_pei_term_type) as imei_pei_term_type,
+max(dim_1) as dim_1,
+max(dim_2) as dim_2,
+max(dim_3) as dim_3,
+max(dim_4) as dim_4,
+max(dim_5) as dim_5,
+比对昨日今日的imei_pei_tac，若不一致则更新为1，若一致则更新为0 as term_change_flag,
+abnormal_flag as term_abnormal_flag,
+比对昨日今日的imei_pei_tac，若不一致则更新为最新日期，若一致则不更新日期 as term_change_time,
+service_perceive_good_rat as term_service_perceive_good_rat,
+case when  
+    weightedAverage(array(
+            (case WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+             (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+             ELSE 0 end),
+            0.7,
+            (case
+             WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+             (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+             ELSE 0 end),
+            0.3))>0 
+    or 
+    weightedAverage(array(
+            (case WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+             (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+             ELSE 0 end),
+            0.8,
+            (case
+             WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+             (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+             ELSE 0 end),
+            0.2))>0 
+    or 
+    (case WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+            (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+            ELSE 0 end)>0 
+    or 
+    (case WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+            (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+            ELSE 0 end)>0 
+then 
+    weightedAverage(array(
+       weightedAverage(array(
+        (case
+         WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+         (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+         ELSE 0 end),
+        0.7,
+        (case
+         WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+         (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+         ELSE 0 end),
+        0.3)),
+       0.4,
+       weightedAverage(array(
+        (case
+         WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+         (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+         ELSE 0 end),
+        0.8,
+        (case
+         WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+         (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+         ELSE 0 end),
+        0.2)),
+       0.35,
+       (case
+        WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+        (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+        ELSE 0 end),
+       0.15,
+       (case
+        WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+        (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+        ELSE 0 end),
+       0.1))
+       /
+       (if(weightedAverage(array(
+        (case
+         WHEN (sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))>0 THEN
+         (sum(nvl(pageopen_delaygood,0)))/(sum(nvl(pageopen_delaygood,0))+sum(nvl(pageopen_delaybad,0)))
+         ELSE 0 end),
+        0.7,
+        (case
+         WHEN (sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))>0 THEN
+         (sum(nvl(first_screen_delaygood,0)))/(sum(nvl(first_screen_delaygood,0))+sum(nvl(first_screen_delaybad,0)))
+         ELSE 0 end),
+        0.3))>0,0.4,0)
+        +
+        if(weightedAverage(array(
+        (case
+         WHEN (sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))>0 THEN
+         (sum(nvl(video_avgspeed_good,0)))/(sum(nvl(video_avgspeed_good,0))+sum(nvl(video_avgspeed_bad,0)))
+         ELSE 0 end),
+        0.8,
+        (case
+         WHEN (sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))>0 THEN
+         (sum(nvl(videoplay_halt_good,0)))/(sum(nvl(videoplay_halt_good,0))+sum(nvl(videoplay_halt_bad,0)))
+         ELSE 0 end),
+        0.2))>0,0.35,0)
+        +
+        if((case
+        WHEN (sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))>0 THEN
+        (sum(nvl(connect_good,0)))/(sum(nvl(connect_good,0))+sum(nvl(connect_bad,0)))
+        ELSE 0 end)>0,0.15,0)
+        +
+        if((case
+        WHEN (sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))>0 THEN
+        (sum(nvl(chkhand_good,0)))/(sum(nvl(chkhand_good,0))+sum(nvl(chkhand_bad,0)))
+        ELSE 0 end)>0,0.1,0)) 
+else null end as usr_service_perceive_good_rat,
+判断当前用户的usr_service_perceive_good_rat，在全用户中的排名比例 as termusr_beat_rate,
+sum(n3_other_cnt+n3_http_cnt+n3_video_cnt) as total_record_num,
+sum(n3_other_abnormal_cnt+n3_http_abnormal_cnt+n3_video_abnormal_cnt) as abnormal_record_num,
+sum(duration) as total_duration,
+sum(total_data) as total_data,
+sum(rtt_ul_server_bat) as rtt_ul_server_bat,
+sum(rtt_ul_server_good) as rtt_ul_server_good,
+sum(rtt_dl_termeral_bat) as rtt_dl_termeral_bat,
+sum(rtt_dl_termeral_good) as rtt_dl_termeral_good,
+sum(ul_packet_loss_rate_bat_cnt) as ul_packet_loss_rate_bat_cnt,
+sum(dl_packet_loss_rate_bat_cnt) as dl_packet_loss_rate_bat_cnt,
+sum(dl_download_bat) as dl_download_bat,
+sum(dl_download_good) as dl_download_good,
+sum(pageopen_delaybad) as pageopen_delaybad,
+sum(pageopen_delaygood) as pageopen_delaygood,
+sum(first_screen_delaybad) as first_screen_delaybad,
+sum(first_screen_delaygood) as first_screen_delaygood,
+sum(video_avgspeed_bad) as video_avgspeed_bad,
+sum(video_avgspeed_good) as video_avgspeed_good,
+sum(videoplay_halt_bad) as videoplay_halt_bad,
+sum(videoplay_halt_good) as videoplay_halt_good,
+sum(videobit_code_bad) as videobit_code_bad,
+sum(videobit_code_good) as videobit_code_good,
+sum(chkhand_bad) as chkhand_bad,
+sum(chkhand_good) as chkhand_good,
+sum(http_dns_reply_delaybad) as http_dns_reply_delaybad,
+sum(http_dns_reply_delaygood) as http_dns_reply_delaygood,
+sum(n3_dns_cnt) as dns_resp_req_cnt,
+sum(dns_resp_fail_cnt) as dns_resp_fail_cnt,
+sum(dns_resp_succ_cnt) as dns_resp_succ_cnt,
+sum(dns_reply_delaybad) as dns_reply_delaybad,
+sum(dns_reply_delaygood) as dns_reply_delaygood,
+sum(n3_other_abnormal_cnt+n3_http_abnormal_cnt+n3_video_abnormal_cnt)/sum(n3_http_cnt+n3_other_cnt+n3_video_cnt) as abnormal_record_rate,
+case when sum(n3_other_abnormal_cnt+n3_http_abnormal_cnt+n3_video_abnormal_cnt)/sum(n3_http_cnt+n3_other_cnt+n3_video_cnt)>=0.3 then 1 else 0 end as abnormal_flag
+from tmp_dm_ct_xdr_lte_5g_s1u
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>

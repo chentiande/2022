@@ -1,0 +1,32 @@
+<AggrSqlConfig topicId="dm_ct_pm_4gc_sgw_mme_d" period="1d"
+               desc="4G核心网-SGW&MME性能表(1天)">
+      <functions>
+	  </functions>
+
+    <tempTables>
+	
+    </tempTables>
+
+    <resultTables>
+	        <resultTable>
+	<sql>
+		<![CDATA[
+			insert overwrite table ${result_db}.dm_ct_pm_4gc_sgw_mme_d partition(p_date='${p_date}')
+		
+select substr('${p_start_time}',1,8) as starttime,
+EQUIP_DESC as equip_name,
+NODE_DESC as node_name,
+EQUIP_TYPE as equip_type,
+OS_TYPE as os_type,
+EQUIP_ATTRIBUTE as equip_attribute,
+EQUIP_IP as equip_ip,
+DISK_USE_RAT as disk_use_rat,
+CPU_USE_RAT as cpu_use_rat,
+MEMORY_USE_RAT as memory_use_rat
+from ${source_db}.用户提� where p_date>='${p_date_start}' and p_date<'${p_date_end}' 
+
+						  ]]>
+            </sql>
+        </resultTable>
+	</resultTables>
+	</AggrSqlConfig>
