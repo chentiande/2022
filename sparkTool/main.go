@@ -147,6 +147,7 @@ func makeXml(st SparkTable, filedir string) {
 		</sql>`
 	}
 
+	//如果是多维度，需要根据不同的维度值进行多空间维度的汇总，之间使用union
 	for z := 0; z < st.SourceisDwdCount; z++ {
 
 		selectcol = ""
@@ -271,6 +272,8 @@ func makeXml(st SparkTable, filedir string) {
 
 		selectall += "\nselect " + dim + selectcol[:len(selectcol)-2] + "\nfrom " + tmptable + groupby + "\nunion all"
 	}
+
+	//如果有工参表，需要处理工参表的关联关系
 	if st.SourceCmTable != "" {
 
 		selectall = "\n select " + dim + selectcol[:len(selectcol)-2] + "\nfrom \n(select * from " + tmptable + " \n) t1 \n " + st.SourceWhere[strings.Index(st.SourceWhere, "inner join"):] + "\n" + groupby
@@ -279,7 +282,7 @@ func makeXml(st SparkTable, filedir string) {
 	if selectall[len(selectall)-9:] == "union all" {
 		selectall = selectall[:len(selectall)-9]
 	}
-
+	//组合汇总
 	resulttable = `        <resultTable>
 	<sql>
 		<![CDATA[
@@ -308,6 +311,7 @@ func makeXml(st SparkTable, filedir string) {
 
 }
 
+//根据路径和文件名进行文件创建
 func fw(filedir, filename string, content string) {
 	os.Mkdir(filedir, 660)
 	f, _ := os.Create(filedir + "/" + filename) //创建文件
@@ -318,6 +322,7 @@ func fw(filedir, filename string, content string) {
 
 }
 
+//创建sh脚本
 func makeSh(st SparkTable, filedir string) {
 	sh := `#!/bin/bash
 	script_home=$(dirname $0)
@@ -360,6 +365,7 @@ func makeSh(st SparkTable, filedir string) {
 	fw(filedir, st.DestTable+".sh", sh)
 }
 
+//创建hql
 func makeHql(st SparkTable, filedir string) {
 	column := ""
 	for i := 0; i < len(st.DestColumnName); i++ {
