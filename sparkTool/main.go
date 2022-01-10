@@ -17,22 +17,23 @@ type SparkTables struct {
 	sp        []SparkTable
 }
 
+//模型关键信息，一张表一个结构体
 type SparkTable struct {
-	SourceisDwd      bool //多维度汇总
-	SourceisDwdCount int  //多维度数量
-	SourcePmCount    int
-	SourcePmTable    string
-	SourceWhere      string
-	SourcePmTables   []string
-	DestTableZh      string
-	SourceCmTable    string
-	DestTable        string
-	DestColumnName   []string
-	DestColumnType   []string
-	DestColumnExpr   []string
-	DestColumnDim    []string
-	DestColumnKJ     []string
-	DestColumnSJ     []string
+	SourceisDwd      bool     //多维度汇总
+	SourceisDwdCount int      //多维度数量
+	SourcePmCount    int      //性能表条数
+	SourcePmTable    string   //性能表，多张用#，使用时先拆分
+	SourceWhere      string   //获取源表的过滤条件
+	SourcePmTables   []string //每个字段对应的多张表
+	DestTableZh      string   //源表的中文名称
+	SourceCmTable    string   //工参表，多张用#，使用时先拆分
+	DestTable        string   //汇总目标表
+	DestColumnName   []string //汇总目标表字段名
+	DestColumnType   []string //汇总目标表字段类型
+	DestColumnExpr   []string //汇总目标表算法表达式
+	DestColumnDim    []string //汇总目标表维度字段
+	DestColumnKJ     []string //汇总目标表空间聚合算法
+	DestColumnSJ     []string //汇总目标表时间聚合算法
 }
 
 func main() {
@@ -70,6 +71,8 @@ func main() {
 
 	fmt.Println("生成成功")
 }
+
+//判断计算表达式中是否有函数名称
 func isfuncstr(st []string) string {
 
 	function := ""
@@ -90,6 +93,7 @@ func isfuncstr(st []string) string {
 	return function
 }
 
+//根据一张表模型进行计算配置文件的生成
 func makeXml(st SparkTable, filedir string) {
 	function := isfuncstr(st.DestColumnExpr)
 	resulttable := ""
@@ -99,7 +103,7 @@ func makeXml(st SparkTable, filedir string) {
 	groupby := ""
 	tmptable := ""
 	selectall := ""
-
+	//如果多维度计算，需要根据计算表达式抽提字段并按照不同的表进行临时表创建，多张表实现union
 	if st.SourcePmCount > 1 || st.SourceisDwd {
 		temptable = " <tableName>tmp_" + st.DestTable[0:20] + "</tableName>\n<sql>\n<![CDATA[select \n"
 
@@ -378,6 +382,7 @@ location "${hivevar:basepath}/` + st.DestTable + `/";`
 
 }
 
+//读取excel的sheet构造多个表的信息结构体
 func makeSparkTable(xlsname string, sheetname string) SparkTables {
 	f, err := excelize.OpenFile(xlsname)
 
@@ -395,6 +400,7 @@ func makeSparkTable(xlsname string, sheetname string) SparkTables {
 	sts := SparkTables{}
 	st := SparkTable{}
 	var i int
+	//循环读取，判断是否为同一个表
 	for z, row := range recode[1:] {
 
 		if len(sts.tablename) == 0 || sts.tablename[len(sts.tablename)-1] != row[4] {
@@ -403,16 +409,17 @@ func makeSparkTable(xlsname string, sheetname string) SparkTables {
 			st = SparkTable{}
 		}
 
+		//表的第一行时相关信息获取
 		if i == 0 {
-			sts.tablename = append(sts.tablename, row[4])
-			st.SourceWhere = row[15]
+			sts.tablename = append(sts.tablename, row[4]) //表名
+			st.SourceWhere = row[15]                      //where 条件   多张表用/分开
 			st.SourceisDwdCount = 1
 
 			tmpsourcetable := strings.Split(strings.ReplaceAll(row[16], "\\", "/"), "/")
 			pm := ""
 			cm := ""
 			cmcount := 0
-
+			//判断是多张表汇总还是单张表，是否有工参表
 			if len(tmpsourcetable) == 1 {
 				pm = tmpsourcetable[0]
 			} else {
@@ -433,7 +440,7 @@ func makeSparkTable(xlsname string, sheetname string) SparkTables {
 			if len(cm) > 0 {
 				st.SourceCmTable = cm[:len(cm)-1]
 			}
-
+			//表名和中文表名
 			st.DestTable = row[4]
 			st.DestTableZh = row[3]
 
@@ -449,7 +456,7 @@ func makeSparkTable(xlsname string, sheetname string) SparkTables {
 		st.DestColumnExpr = append(st.DestColumnExpr, strings.TrimRight(row[13], " "))
 		st.DestColumnKJ = append(st.DestColumnKJ, row[11])
 		st.DestColumnSJ = append(st.DestColumnSJ, row[12])
-
+		//如果是最后一行进行对象赋值
 		if z == len(recode)-2 {
 			sts.sp = append(sts.sp, st)
 		}
@@ -457,11 +464,14 @@ func makeSparkTable(xlsname string, sheetname string) SparkTables {
 
 	return sts
 }
+
+//判断是否为数字
 func IsNum(s string) bool {
 	_, err := strconv.ParseFloat(s, 64)
 	return err == nil
 }
 
+//对数组进行排序，过滤和去重
 func RemoveDuplicatesAndEmpty(a []string) (ret []string) {
 	a_len := len(a)
 	sort.Strings(a)
@@ -498,6 +508,8 @@ func RemoveDuplicatesAndEmpty(a []string) (ret []string) {
 	return
 }
 
+//根据算法中的表达式，提取对应的字段类型
+//如果table为空则全部提取，如果table有值，根据SourcePmTables进行过滤
 func getScounter(st SparkTable, table string) []string {
 	str := ""
 	if table == "" {
@@ -534,6 +546,7 @@ func getScounter(st SparkTable, table string) []string {
 	return def3
 }
 
+//判断一个字符串数组中是否存在字符串
 func instrings(a string, b []string) bool {
 
 	for _, v := range b {
