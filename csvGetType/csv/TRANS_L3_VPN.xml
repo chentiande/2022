@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource-data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="resource-data.xsd">
+  <ConfigClass type='sql' zhCN='L3VPN' zhEN='TRANS_L3_VPN' Remark='SPN网络资源'>
+    <SQL_String>SELECT  A.ZONE_ID, A.RMUID, A.NATIVENAME, A.DIRECTION, A.ACTIVESTATE, A.TUNNELNAME, A.TUNNELRMUID, A.ISTUNNELGROUP, A.EMSNAME, A.INT_ID, A.MODIFY_BY, A.MODIFY_DATE, A.TIME_STAMP, A.CREATE_BY, A.CREATE_DATE, A.STATEFLAG, A.ZH_LABEL
+                FROM RMS_TRANS_L3_VPN@LC_RMS A
+                WHERE A.STATEFLAG=0
+    </SQL_String>
+    <FTP_INFO  ftp_adds='10.173.104.200' port='8021' ftp_user='lczg' ftp_pwd='Lczg#7890' ftp_path='/transtozz' file_rule='csv' />
+		  <Node zhEN='ZONE_ID'                                     zhCN='所属地市'                         Remark='A.ZONE_ID=RMS_ZONE.INT_ID' />
+		  <Node zhEN='RMUID'                                       zhCN='L3VPN rmUID'                      Remark='0' />
+		  <Node zhEN='NATIVENAME'                                  zhCN='本地名称'                         Remark='0' />
+		  <Node zhEN='DIRECTION'                                   zhCN='方向'                             Remark='CD_BI,双向;CD_UNI,单向' />
+		  <Node zhEN='ACTIVESTATE'                                 zhCN='激活标识'                         Remark='ACTIVE,激活;PARTIAL,部分激活;PENDING,去激活' />
+		  <Node zhEN='TUNNELNAME'                                  zhCN='关联隧道名称/关联SR隧道业务名称'  Remark='A.TUNNELNAME=VIEW_TUNNELNAME.INT_ID' />
+		  <Node zhEN='TUNNELRMUID'                                 zhCN='关联隧道rmUID/关联SR隧道业务rmUID' Remark='0' />
+		  <Node zhEN='ISTUNNELGROUP'                               zhCN='Tunnel是否为隧道组'               Remark='false,否;true,是' />
+		  <Node zhEN='EMSNAME'                                     zhCN='所属EMS'                          Remark='0' />
+		  <Node zhEN='INT_ID'                                      zhCN='流水号'                           Remark='0' />
+		  <Node zhEN='MODIFY_BY'                                   zhCN='修改人'                           Remark='0' />
+		  <Node zhEN='MODIFY_DATE'                                 zhCN='修改时间'                         Remark='0' />
+		  <Node zhEN='TIME_STAMP'                                  zhCN='时间戳'                           Remark='0' />
+		  <Node zhEN='CREATE_BY'                                   zhCN='创建人'                           Remark='0' />
+		  <Node zhEN='CREATE_DATE'                                 zhCN='创建时间'                         Remark='0' />
+		  <Node zhEN='STATEFLAG'                                   zhCN='删除标识'                         Remark='0' />
+		  <Node zhEN='ZH_LABEL'                                    zhCN='中文名称'                         Remark='0' />
+  </ConfigClass>
+</resource-data>

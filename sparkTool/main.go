@@ -396,7 +396,9 @@ func makeSparkTable(xlsname string, sheetname string) SparkTables {
 		log.Fatalf("无法打开文件 %s\n", xlsname)
 
 	}
-
+	for index, name := range f.GetSheetMap() {
+		fmt.Println(index, name)
+	}
 	recode := f.GetRows(sheetname)
 
 	if len(recode) == 0 {
