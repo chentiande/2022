@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/tealeg/xlsx"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -17,13 +18,17 @@ import (
 
 type tableinfo struct {
 	filename     []string
+	tablename    []string
+	tablezhname  []string
 	colsoucename []string
 	colname      []string
+	colzhname    []string
 	coltype      []string
 	collen       []int
 	colmax       []int
 	colmin       []int
 	coldata      []string
+	isstand      []string
 }
 
 func main() {
@@ -31,21 +36,48 @@ func main() {
 	var wcomma string
 	var isgbk int
 	var isheader int
+	var filename string
+	var version bool
+
 	flag.StringVar(&dirname, "dir", "csv", "csv所在的目录")
 	flag.StringVar(&wcomma, "wcomma", "^", "csv字段分隔符")
-	flag.IntVar(&isgbk, "isgbk", 1, "输入csv文件格式，如果是gbk则配置为1")
+	flag.StringVar(&filename, "mf", "模型.xlsx", "标准模型表")
+	flag.IntVar(&isgbk, "isgbk", 0, "输入csv文件格式，如果是gbk则配置为1")
 	flag.IntVar(&isheader, "isheader", 1, "输入csv文件第一行是否为表头，1为是")
+
+	flag.BoolVar(&version, "v", false, "查看版本")
+
 	flag.Parse()
-	fmt.Println(dirname)
+
+	if version {
+		msg :=
+			` ----------------------------     
+| author:chentd@tongtech.com |
+ ----------------------------
+     2022-01-19 v0.1 根据样例数据和标准模型生成模型
+	1、根据csv样例数据定义数据类型，int bigint  varchar timestamp
+	2、根据模型中的样例文件名和表名进行比对分析
+	3、根据标准模型进行分析
+	4、生成单个模型的比对结果，生成单个模型的建表脚本，生成总的建表脚本
+		 `
+		fmt.Println(msg)
+		os.Exit(0)
+
+	}
+
 	files1, _ := ioutil.ReadDir(dirname)
+
+	sqlall := ""
 	for _, v := range files1 {
 
 		if strings.ToLower(v.Name()[len(v.Name())-4:]) == ".csv" {
-			unloadxls(v.Name()[:len(v.Name())-4]+".xlsx", getcsvinfo(dirname+"/"+v.Name(), wcomma, isgbk, isheader))
-			fmt.Println(v.Name(), "转化成功")
+			unloadxls(v.Name()[:len(v.Name())-4]+".xlsx", getcsvinfo(filename, dirname, v.Name(), wcomma, isgbk, isheader))
+			sqlall += mksql(v.Name()[:len(v.Name())-4], getcsvinfo(filename, dirname, v.Name(), wcomma, isgbk, isheader))
+			fmt.Println(v.Name(), "完成转化")
 		}
 
 	}
+	fw("sql", "all.sql", sqlall)
 
 }
 func getlen(length int) int {
@@ -66,6 +98,44 @@ func getlen(length int) int {
 		return 2000
 	}
 }
+func fw(filedir, filename string, content string) {
+	os.Mkdir(filedir, 660)
+	f, _ := os.Create(filedir + "/" + filename) //创建文件
+
+	defer f.Close()
+	f.WriteString(content)
+	f.Sync()
+
+}
+func mksql(filename string, tableinfo2 tableinfo) string {
+
+	if len(tableinfo2.coltype) == 0 {
+		return ""
+	}
+
+	os.Mkdir("sql", 0660)
+	sql := "drop table if exists " + tableinfo2.tablename[0] + ";\n"
+	sql += "create table " + tableinfo2.tablename[0] + " (\n"
+	for i, _ := range tableinfo2.colsoucename {
+
+		sql += tableinfo2.colname[i] + " "
+
+		if tableinfo2.coltype[i] == "varchar" {
+			sql += tableinfo2.coltype[i] + "(" + strconv.Itoa(getlen(tableinfo2.collen[i])) + "),\n"
+		} else if tableinfo2.coltype[i] == "int" && tableinfo2.colmax[i] > 2147483647 {
+			sql += "bigint,\n"
+
+		} else {
+			sql += tableinfo2.coltype[i] + ",\n"
+
+		}
+
+	}
+	sql = sql[:len(sql)-2] + "\n);\n"
+	fw("sql", filename+".sql", sql)
+	return sql
+
+}
 
 func unloadxls(filename string, tableinfo2 tableinfo) {
 	os.Mkdir("xlsx", 0660)
@@ -84,7 +154,8 @@ func unloadxls(filename string, tableinfo2 tableinfo) {
 	}
 	row = sheet.AddRow()
 	cell = row.AddCell()
-
+	cell.Value = "表名"
+	cell = row.AddCell()
 	cell.Value = "厂家字段"
 	cell = row.AddCell()
 	cell.Value = "定义字段"
@@ -98,10 +169,13 @@ func unloadxls(filename string, tableinfo2 tableinfo) {
 	cell.Value = "最小值"
 	cell = row.AddCell()
 	cell.Value = "样例数据"
+	cell = row.AddCell()
+	cell.Value = "备注"
 	for i, _ := range tableinfo2.colsoucename {
 		if len(tableinfo2.collen) > i {
 			row = sheet.AddRow()
-
+			cell = row.AddCell()
+			cell.Value = tableinfo2.tablename[i]
 			cell = row.AddCell()
 			cell.Value = tableinfo2.colsoucename[i]
 			cell = row.AddCell()
@@ -110,17 +184,17 @@ func unloadxls(filename string, tableinfo2 tableinfo) {
 			if tableinfo2.coltype[i] == "varchar" {
 				cell.Value = tableinfo2.coltype[i] + "(" + strconv.Itoa(getlen(tableinfo2.collen[i])) + ")"
 				cell = row.AddCell()
-			} else if tableinfo2.coltype[i] == "int" && getlen(tableinfo2.collen[i]) == 64 {
+			} else if tableinfo2.coltype[i] == "int" && tableinfo2.colmax[i] > 2147483647 {
 				cell.Value = "bigint"
 				cell = row.AddCell()
 			} else {
 				cell.Value = tableinfo2.coltype[i]
 				cell = row.AddCell()
 			}
-			if tableinfo2.coltype[i] == "int" && getlen(tableinfo2.collen[i]) <= 32 {
+			if tableinfo2.coltype[i] == "int" && tableinfo2.colmax[i] <= 2147483647 {
 				cell.Value = "32"
 				cell = row.AddCell()
-			} else if tableinfo2.coltype[i] == "int" && getlen(tableinfo2.collen[i]) == 64 {
+			} else if tableinfo2.coltype[i] == "int" && tableinfo2.colmax[i] > 2147483647 {
 				cell.Value = "64"
 				cell = row.AddCell()
 			} else if tableinfo2.coltype[i] == "timestamp" {
@@ -136,6 +210,9 @@ func unloadxls(filename string, tableinfo2 tableinfo) {
 			cell = row.AddCell()
 
 			cell.Value = tableinfo2.coldata[i]
+			cell = row.AddCell()
+			cell.Value = tableinfo2.isstand[i]
+
 		}
 
 	}
@@ -162,9 +239,35 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 	return d, nil
 }
 
-func getcsvinfo(filename string, fgf string, isgbk int, isheader int) tableinfo {
+func getcsvinfo(mf string, dirname string, filename string, fgf string, isgbk int, isheader int) tableinfo {
+	tablename := ""
+	tablezhname := ""
+	if mf != "" {
+
+		f, err := excelize.OpenFile(mf)
+
+		if err != nil {
+			fmt.Println("无法打开文件 ", mf)
+
+		}
+
+		recode := f.GetRows("文件表对应")
+
+		if len(recode) == 0 {
+			fmt.Println("sheetname 错误")
+		} else {
+			for i := range recode {
+				if recode[i][0] == filename {
+					tablename = recode[i][1]
+				}
+			}
+
+		}
+
+	}
+
 	ti := tableinfo{}
-	fp, err := os.Open(filename)
+	fp, err := os.Open(dirname + "/" + filename)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -180,6 +283,11 @@ func getcsvinfo(filename string, fgf string, isgbk int, isheader int) tableinfo 
 	}
 
 	for mm, v := range recode {
+		ti.filename = append(ti.filename, filename)
+		ti.tablename = append(ti.tablename, tablename)
+		ti.tablezhname = append(ti.tablezhname, tablename)
+		ti.isstand = append(ti.isstand, "省内个性化字段")
+		ti.colzhname = append(ti.colzhname, "")
 		if isheader == 1 {
 			ti.colsoucename = append(ti.colsoucename, v)
 			ti.colname = append(ti.colname, strings.ToLower(v))
@@ -200,6 +308,7 @@ func getcsvinfo(filename string, fgf string, isgbk int, isheader int) tableinfo 
 				ti.filename = append(ti.filename, filename)
 				ti.coltype = append(ti.coltype, gettype(v))
 				ti.collen = append(ti.collen, len(v))
+
 				if isgbk == 1 {
 					tmp_v, _ := GbkToUtf8([]byte(v))
 					ti.coldata = append(ti.coldata, string(tmp_v))
@@ -243,6 +352,79 @@ func getcsvinfo(filename string, fgf string, isgbk int, isheader int) tableinfo 
 	}
 
 xxx:
+	if len(ti.coltype) == 0 {
+		for _ = range ti.tablename {
+			ti.coltype = append(ti.coltype, "varchar")
+			ti.collen = append(ti.collen, 0)
+			ti.colmax = append(ti.colmax, 0)
+			ti.colmin = append(ti.colmin, 0)
+			ti.coldata = append(ti.coldata, "")
+
+		}
+	}
+	//fmt.Printf("%v", ti)
+	if mf != "" {
+		f, err := excelize.OpenFile(mf)
+
+		if err != nil {
+			fmt.Println("无法打开文件 ", mf)
+
+		}
+
+		recode := f.GetRows("标准模型")
+
+		if len(recode) == 0 {
+			fmt.Println("sheetname 错误")
+		} else {
+			for i := range recode {
+				ishave := false
+
+				if recode[i][0] == tablename {
+					tablezhname = recode[i][0]
+					for i2 := range ti.colname {
+						ti.tablezhname[i2] = tablezhname
+
+						if ti.colname[i2] == recode[i][2] {
+							ishave = true
+							ti.colzhname[i2] = recode[i][3]
+
+							if ti.coltype[i2] == recode[i][4] || (len(recode[i][4]) > 6 && ti.coltype[i2] == recode[i][4][:7]) {
+								ti.isstand[i2] = "规范字段，类型匹配"
+								strlen, _ := strconv.Atoi(recode[i][5])
+								if ti.collen[i2] == 0 {
+									ti.collen[i2] = strlen
+								}
+							} else {
+								ti.isstand[i2] = "规范字段，类型不匹配"
+								ti.coltype[i2] = recode[i][4]
+							}
+						}
+
+					}
+					if !ishave {
+						ti.filename = append(ti.filename, filename)
+						ti.tablename = append(ti.tablename, tablename)
+						ti.tablezhname = append(ti.tablezhname, tablezhname)
+						ti.colsoucename = append(ti.colsoucename, "")
+						ti.colname = append(ti.colname, recode[i][2])
+						ti.colzhname = append(ti.colzhname, recode[i][3])
+						ti.coltype = append(ti.coltype, recode[i][4])
+						strlen, _ := strconv.Atoi(recode[i][5])
+						ti.collen = append(ti.collen, strlen)
+						ti.colmax = append(ti.colmax, 0)
+						ti.colmin = append(ti.colmin, 0)
+						ti.coldata = append(ti.coldata, "")
+						ti.isstand = append(ti.isstand, "缺失规范字段")
+
+					}
+
+				}
+			}
+
+		}
+
+	}
+
 	return ti
 }
 
