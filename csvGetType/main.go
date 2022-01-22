@@ -38,12 +38,14 @@ func main() {
 	var isheader int
 	var filename string
 	var version bool
+	var ylcount int 
 
 	flag.StringVar(&dirname, "dir", "csv", "csv所在的目录")
 	flag.StringVar(&wcomma, "wcomma", "^", "csv字段分隔符")
 	flag.StringVar(&filename, "mf", "模型.xlsx", "标准模型表")
 	flag.IntVar(&isgbk, "isgbk", 0, "输入csv文件格式，如果是gbk则配置为1")
 	flag.IntVar(&isheader, "isheader", 1, "输入csv文件第一行是否为表头，1为是")
+	flag.IntVar(&ylcount, "ylcount", 1000, "识别样例数据的类型设置的条数")
 
 	flag.BoolVar(&version, "v", false, "查看版本")
 
@@ -59,6 +61,10 @@ func main() {
 	2、根据模型中的样例文件名和表名进行比对分析
 	3、根据标准模型进行分析
 	4、生成单个模型的比对结果，生成单个模型的建表脚本，生成总的建表脚本
+
+	2022-01-21 v0.2 
+	1、修正识别长度超过2000的基于识别+50
+	2、增加类型识别样例条数设置，默认识别1000行
 		 `
 		fmt.Println(msg)
 		os.Exit(0)
@@ -71,8 +77,8 @@ func main() {
 	for _, v := range files1 {
 
 		if strings.ToLower(v.Name()[len(v.Name())-4:]) == ".csv" {
-			unloadxls(v.Name()[:len(v.Name())-4]+".xlsx", getcsvinfo(filename, dirname, v.Name(), wcomma, isgbk, isheader))
-			sqlall += mksql(v.Name()[:len(v.Name())-4], getcsvinfo(filename, dirname, v.Name(), wcomma, isgbk, isheader))
+			unloadxls(v.Name()[:len(v.Name())-4]+".xlsx", getcsvinfo(ylcount,filename, dirname, v.Name(), wcomma, isgbk, isheader))
+			sqlall += mksql(v.Name()[:len(v.Name())-4], getcsvinfo(ylcount,filename, dirname, v.Name(), wcomma, isgbk, isheader))
 			fmt.Println(v.Name(), "完成转化")
 		}
 
@@ -95,7 +101,7 @@ func getlen(length int) int {
 	case length <= 1000:
 		return 1000
 	default:
-		return 2000
+		return length+50
 	}
 }
 func fw(filedir, filename string, content string) {
@@ -239,7 +245,7 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 	return d, nil
 }
 
-func getcsvinfo(mf string, dirname string, filename string, fgf string, isgbk int, isheader int) tableinfo {
+func getcsvinfo(ylcount int,mf string, dirname string, filename string, fgf string, isgbk int, isheader int) tableinfo {
 	tablename := ""
 	tablezhname := ""
 	if mf != "" {
@@ -319,6 +325,16 @@ func getcsvinfo(mf string, dirname string, filename string, fgf string, isgbk in
 				ti.colmax = append(ti.colmax, 0)
 				ti.colmin = append(ti.colmin, 0)
 			} else {
+               if i < ylcount{
+				   tmpz:=gettype(v)
+				   if ti.coltype[k]!=tmpz && tmpz=="varchar" {
+					ti.coltype[k]=gettype(v) 
+				   }
+
+			   }
+              
+				
+			   
 
 				if ti.collen[k] < len(v) {
 					ti.collen[k] = len(v)
