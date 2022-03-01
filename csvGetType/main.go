@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -38,12 +39,14 @@ func main() {
 	var isgbk int
 	var isheader int
 	var filename string
+	var pk string
 	var version bool
 	var ylcount int
 
 	flag.StringVar(&dirname, "dir", "csv", "csv所在的目录")
 	flag.StringVar(&wcomma, "wcomma", "^", "csv字段分隔符")
-	flag.StringVar(&filename, "mf", "模型.xlsx", "标准模型表")
+	flag.StringVar(&filename, "mf", "Model.xlsx", "标准模型表")
+	flag.StringVar(&pk, "pk", "int_id", "建表主键指定")
 	flag.IntVar(&isgbk, "isgbk", 0, "输入csv文件格式，如果是gbk则配置为1")
 	flag.IntVar(&isheader, "isheader", 1, "输入csv文件第一行是否为表头，1为是")
 	flag.IntVar(&ylcount, "ylcount", 1000, "识别样例数据的类型抽样比例，设置为1全部，1000为千分之一")
@@ -79,22 +82,22 @@ func main() {
 
 	sqlall := ""
 	allerr := ""
-	allcomment:=""
+	allcomment := ""
 	for _, v := range files1 {
 
 		if strings.ToLower(v.Name()[len(v.Name())-4:]) == ".csv" {
-			xx:=getcsvinfo(ylcount, filename, dirname, v.Name(), wcomma, isgbk, isheader)
-			
-			unloadxls(v.Name()[:len(v.Name())-4]+".xlsx",xx)
-			a,b,c:=mksql(v.Name()[:len(v.Name())-4], xx)
+			xx := getcsvinfo(ylcount, filename, dirname, v.Name(), wcomma, isgbk, isheader)
+
+			unloadxls(v.Name()[:len(v.Name())-4]+".xlsx", xx)
+			a, b, c := mksql(pk,v.Name()[:len(v.Name())-4], xx)
 			sqlall += a
-			allerr+=b
-			allcomment+=c
+			allerr += b
+			allcomment += c
 			fmt.Println(v.Name(), "完成转化")
 		}
 
 	}
-	
+
 	fw("sql", "all.sql", sqlall)
 	fw("sql", "allcomment.sql", allcomment)
 	fw("sql", "allerr.csv", "\xEF\xBB\xBF文件名\t表名\t字段名\t类型\t备注\n"+allerr)
@@ -127,29 +130,28 @@ func fw(filedir, filename string, content string) {
 	f.Sync()
 
 }
-func mksql(filename string, tableinfo2 tableinfo) (allsql,allerr,allcomment string) {
-   
+func mksql(pk string,filename string, tableinfo2 tableinfo) (allsql, allerr, allcomment string) {
+
 	if len(tableinfo2.coltype) == 0 {
-		return "","",""
+		return "", "", ""
 	}
 
 	os.Mkdir("sql", 0660)
-	commont:="comment on table "+tableinfo2.tablename[0]+" is '"+tableinfo2.tablezhname[0]+"';\n"
-	sql := "drop table if exists " + tableinfo2.tablename[0] + ";\n"
-	
-	sql += "create table " + tableinfo2.tablename[0] + " (\n"
+	commont := "comment on table cadb." + tableinfo2.tablename[0] + " is '" + tableinfo2.tablezhname[0] + "';\n"
+	sql := "drop table if exists cadb." + tableinfo2.tablename[0] + ";\n"
+
+	sql += "create table cadb." + tableinfo2.tablename[0] + " (\n"
 	for i, _ := range tableinfo2.colsoucename {
 
-		
-		if tableinfo2.isstand[i]=="缺失规范字段" || tableinfo2.isstand[i]=="规范字段，类型不匹配"{
-			allerr+=tableinfo2.filename[i]+"\t"+tableinfo2.tablename[i]+"\t"+tableinfo2.colname[i]+"\t"+tableinfo2.coltype[i]+"\t"+tableinfo2.isstand[i]+"\n"
+		if tableinfo2.isstand[i] == "缺失规范字段" || tableinfo2.isstand[i] == "规范字段，类型不匹配" {
+			allerr += tableinfo2.filename[i] + "\t" + tableinfo2.tablename[i] + "\t" + tableinfo2.colname[i] + "\t" + tableinfo2.coltype[i] + "\t" + tableinfo2.isstand[i] + "\n"
 		}
-		commont+="comment on column "+tableinfo2.tablename[0]+"."+tableinfo2.colname[i]+" is '"+tableinfo2.colzhname[i]+"';\n"
+		commont += "comment on column cadb." + tableinfo2.tablename[0] + "." + tableinfo2.colname[i] + " is '" + tableinfo2.colzhname[i] + "';\n"
 
 		sql += tableinfo2.colname[i] + " "
 
-		if tableinfo2.coltype[i] == "varchar" || tableinfo2.coltype[i] ==""{
-			sql +="varchar(" + strconv.Itoa(getlen(tableinfo2.collen[i])) + "),\n"
+		if tableinfo2.coltype[i] == "varchar" || tableinfo2.coltype[i] == "" {
+			sql += "varchar(" + strconv.Itoa(getlen(tableinfo2.collen[i])) + "),\n"
 		} else if tableinfo2.coltype[i] == "int" && tableinfo2.colmax[i] > 2147483647 {
 			sql += "bigint,\n"
 
@@ -159,9 +161,9 @@ func mksql(filename string, tableinfo2 tableinfo) (allsql,allerr,allcomment stri
 		}
 
 	}
-	sql = sql[:len(sql)-2] + "\n);\n"
+	sql = sql + "PRIMARY KEY ("+pk+"));\n"
 	fw("sql", filename+".sql", sql+commont)
-	return sql,allerr,commont
+	return sql, allerr, commont
 
 }
 
@@ -210,7 +212,7 @@ func unloadxls(filename string, tableinfo2 tableinfo) {
 			cell.Value = tableinfo2.colname[i]
 			cell = row.AddCell()
 			if tableinfo2.coltype[i] == "varchar" || tableinfo2.coltype[i] == "" {
-				cell.Value =  "varchar(" + strconv.Itoa(getlen(tableinfo2.collen[i])) + ")"
+				cell.Value = "varchar(" + strconv.Itoa(getlen(tableinfo2.collen[i])) + ")"
 				cell = row.AddCell()
 			} else if tableinfo2.coltype[i] == "int" && tableinfo2.colmax[i] > 2147483647 {
 				cell.Value = "bigint"
@@ -267,15 +269,15 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 	return d, nil
 }
 
-func getzhname(recode [][]string,filename string,colname string) string{
+func getzhname(recode [][]string, filename string, colname string) string {
 
 	if len(recode) == 0 {
 		fmt.Println("sheetname 错误")
 	} else {
 		for i := range recode {
-		
-			if recode[i][7] == filename && recode[i][2]==colname {
-				
+
+			if recode[i][7] == filename && recode[i][2] == colname {
+
 				return recode[i][1]
 			}
 		}
@@ -298,8 +300,6 @@ func getcsvinfo(ylcount int, mf string, dirname string, filename string, fgf str
 		}
 
 		recode := f.GetRows("文件表对应")
-
-
 
 		recodesn = f.GetRows("综资接口")
 
@@ -327,7 +327,7 @@ func getcsvinfo(ylcount int, mf string, dirname string, filename string, fgf str
 
 	wcomma := []rune(fgf)
 	nr.Comma = wcomma[0]
-	nr.LazyQuotes=true
+	nr.LazyQuotes = true
 
 	recode, err := nr.Read()
 	if err != nil {
@@ -339,32 +339,34 @@ func getcsvinfo(ylcount int, mf string, dirname string, filename string, fgf str
 		ti.tablename = append(ti.tablename, tablename)
 		ti.tablezhname = append(ti.tablezhname, tablename)
 		ti.isstand = append(ti.isstand, "省内个性化字段")
-	
+
 		if isheader == 1 {
 			ti.colsoucename = append(ti.colsoucename, v)
 			ti.colname = append(ti.colname, strings.TrimSpace(strings.ToLower(v)))
-			ti.colzhname=append(ti.colzhname, getzhname(recodesn,filename,strings.ToLower(v)))
+			ti.colzhname = append(ti.colzhname, getzhname(recodesn, filename, strings.ToLower(v)))
 		} else {
 			ti.colsoucename = append(ti.colsoucename, "column"+strconv.Itoa(mm))
 			ti.colname = append(ti.colname, "column"+strconv.Itoa(mm))
-			ti.colzhname=append(ti.colzhname, "")
+			ti.colzhname = append(ti.colzhname, "")
 		}
 
 	}
-	errcount := 0
-	for i := 0; ; i++ {
-		
+
+	var i int
+	for i = 0; ; i++ {
 
 		rows, err := nr.Read()
-		if err != nil {
-			errcount += 1
-			
-			if errcount == 10 {
-				goto xxx
-			}
 
+		if err == io.EOF {
+
+			goto xxx
 		}
 
+		if err != nil {
+
+			fmt.Println(rows, err)
+			break
+		}
 		for k, v := range rows {
 
 			if i == 0 {
@@ -382,12 +384,12 @@ func getcsvinfo(ylcount int, mf string, dirname string, filename string, fgf str
 				ti.colmax = append(ti.colmax, 0)
 				ti.colmin = append(ti.colmin, 0)
 			} else {
-				if (i%ylcount==0 || i<1000) && ti.coltype[k]!="varchar" {
-				
+				if (i%ylcount == 0 || i < 1000) && ti.coltype[k] != "varchar" {
+
 					tmpz := gettype(v)
 					if ti.coltype[k] != tmpz && tmpz == "varchar" {
-					
-						ti.coldata[k]=v
+
+						ti.coldata[k] = v
 						ti.coltype[k] = tmpz
 					}
 
@@ -426,6 +428,7 @@ func getcsvinfo(ylcount int, mf string, dirname string, filename string, fgf str
 	}
 
 xxx:
+	fmt.Println("分析数据量为", i+1)
 	if len(ti.coltype) == 0 {
 		for _ = range ti.tablename {
 			ti.coltype = append(ti.coltype, "varchar")
@@ -458,18 +461,15 @@ xxx:
 					for i2 := range ti.colname {
 						ti.tablezhname[i2] = tablezhname
 
-						if ti.colname[i2] == recode[i][2] {
+						if ti.colname[i2] == strings.TrimSpace(strings.ToLower(recode[i][2])) {
 							ishave = true
 							ti.colzhname[i2] = recode[i][3]
 
-						
-                         
-							if (len(recode[i][4]) > 6 && recode[i][4][:7]=="varchar") || ti.coltype[i2]==""|| ti.coltype[i2] == recode[i][4] || (len(recode[i][4]) > 6 && ti.coltype[i2] == recode[i][4][:7]) {
+							if (len(recode[i][4]) > 6 && recode[i][4][:7] == "varchar") || ti.coltype[i2] == "" || ti.coltype[i2] == recode[i][4] || (len(recode[i][4]) > 6 && ti.coltype[i2] == recode[i][4][:7]) {
 								ti.isstand[i2] = "规范字段，类型匹配"
 
-								
-								if (len(recode[i][4]) > 6 && recode[i][4][:7]=="varchar") || ti.coltype[i2]==""{
-									ti.coltype[i2]="varchar"
+								if (len(recode[i][4]) > 6 && recode[i][4][:7] == "varchar") || ti.coltype[i2] == "" {
+									ti.coltype[i2] = "varchar"
 								}
 								strlen, _ := strconv.Atoi(recode[i][5])
 								if ti.collen[i2] == 0 {
@@ -487,7 +487,7 @@ xxx:
 						ti.tablename = append(ti.tablename, tablename)
 						ti.tablezhname = append(ti.tablezhname, tablezhname)
 						ti.colsoucename = append(ti.colsoucename, "")
-						ti.colname = append(ti.colname, recode[i][2])
+						ti.colname = append(ti.colname, strings.TrimSpace(strings.ToLower(recode[i][2])))
 						ti.colzhname = append(ti.colzhname, recode[i][3])
 						ti.coltype = append(ti.coltype, recode[i][4])
 						strlen, _ := strconv.Atoi(recode[i][5])
@@ -510,7 +510,7 @@ xxx:
 }
 
 func gettype(colvalue string) string {
-    if colvalue==""{
+	if colvalue == "" {
 		return ""
 	}
 
