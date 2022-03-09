@@ -24,7 +24,6 @@ import (
 	"golang.org/x/text/transform"
 )
 
-
 var TIME_LOCATION_CST *time.Location
 
 //全局错误标识，如果有错误，显示执行失败
@@ -127,11 +126,11 @@ func querytocsv(db *sql.DB) {
 	fmt.Println("导出数据成功")
 }
 
-func init1(tablename string ) {
+func init1(tablename string) {
 	TIME_LOCATION_CST, _ = time.LoadLocation("Asia/Shanghai")
 	errflag = false
 	_ = os.Mkdir("log", 755)
-	file := "./log/"+tablename+"_" + time.Now().Format("200601021504") + ".log"
+	file := "./log/" + tablename + "_" + time.Now().Format("200601021504") + ".log"
 
 	logFile, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0766)
 	if err != nil {
@@ -161,7 +160,7 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 	}
 	return d, nil
 }
-func loadcsv(commitcount int,debug bool, allnum int, wcomma1 string, isgbk int, i int, ch_run chan int, db *sql.DB, filename string, tablename string) {
+func loadcsv(commitcount int, debug bool, allnum int, wcomma1 string, isgbk int, i int, ch_run chan int, db *sql.DB, filename string, tablename string) {
 
 	fp, err := os.Open(filename)
 	if err != nil {
@@ -188,8 +187,8 @@ func loadcsv(commitcount int,debug bool, allnum int, wcomma1 string, isgbk int, 
 	valstr = valstr[1:]
 
 	strsql := "insert  into " + tablename + " (" + colstr + ") values (" + valstr + ")"
-	log.Printf("第%d个线程:开始对表%s插入数据,导入文件名=%s\n",i+1, tablename, filename)
-	fmt.Printf("第%d个线程:开始对表%s插入数据,导入文件名=%s\n",i+1, tablename, filename)
+	log.Printf("第%d个线程:开始对表%s插入数据,导入文件名=%s\n", i+1, tablename, filename)
+	fmt.Printf("第%d个线程:开始对表%s插入数据,导入文件名=%s\n", i+1, tablename, filename)
 	_, err = db.Exec("select 1 from " + tablename + " where 1=2")
 	if err != nil {
 		log.Fatalf("打开数据库错误,err=%s\n", err)
@@ -201,16 +200,16 @@ func loadcsv(commitcount int,debug bool, allnum int, wcomma1 string, isgbk int, 
 	m := 1
 	for {
 		rows, err := nr.Read()
-        if err == io.EOF {
+		if err == io.EOF {
 			goto xxx
 		}
 
 		if err != nil {
-			if debug{
-				log.Println("err:",err)
+			if debug {
+				log.Println("err:", err)
 			}
-			
-			 continue
+
+			continue
 		}
 		if j%allnum == i {
 			filenum += 1
@@ -246,7 +245,7 @@ func loadcsv(commitcount int,debug bool, allnum int, wcomma1 string, isgbk int, 
 			_, err = tx.Exec(strsql, dest...)
 
 			if err != nil {
-				if debug{
+				if debug {
 					fmt.Printf("提交发生错误：err=%s,dest=%v,strsql=%s\n", err, dest, strsql)
 					log.Printf("提交发生错误：err=%s,dest=%v,strsql=%s\n", err, dest, strsql)
 				}
@@ -259,14 +258,13 @@ func loadcsv(commitcount int,debug bool, allnum int, wcomma1 string, isgbk int, 
 
 			}
 			if (m-1)%commitcount == 0 && txbool {
-				if commitcount>=1000{
+				if commitcount >= 1000 {
 					fmt.Printf("%d插入%d条数据\n", i, m-1)
 				}
 				if txbool == true {
 
-				
-				tx.Commit()
-				txbool = false
+					tx.Commit()
+					txbool = false
 				}
 			}
 			m++
@@ -276,7 +274,7 @@ func loadcsv(commitcount int,debug bool, allnum int, wcomma1 string, isgbk int, 
 xxx:
 	if txbool == true {
 		tx.Commit()
-	
+
 	}
 
 	log.Printf("第%d个线程:文件%s有数据%d条,插入%s数据成功,共插入%d条数据\n", i+1, filename, filenum, tablename, m-1)
@@ -299,10 +297,10 @@ func main() {
 	var wcomma = flag.String("wcomma", "^", "csv字段分隔符")
 	var isgbk = flag.Int("isgbk", 0, "输入csv文件格式，如果是gbk则配置为1")
 	var debug = flag.Bool("debug", false, "打开调测，异常会打印")
-	var del = flag.Bool("del", true, "插入数据前先清除数据")
+	var del = flag.Int("del", 1, "插入数据前先truncate表,0为不删除，1为删除")
 	var num = flag.Int("num", 1, "并发配置数量")
 	var commitcount = flag.Int("commit", 1000, "批次提交数据量")
-	var conf=flag.String("conf","db.conf","数据库连接配置文件")
+	var conf = flag.String("conf", "db.conf", "数据库连接配置文件")
 
 	flag.Parse()
 	init1(*tablename)
@@ -321,7 +319,7 @@ func main() {
 	if *showVer {
 		// Printf( "build name:\t%s\nbuild ver:\t%s\nbuild time:\t%s\nCommitID:%s\n", BuildName, BuildVersion, BuildTime, CommitID )
 		fmt.Printf("build name:\t%s\n", "tongtech loadgp")
-		fmt.Printf("build ver:\t%s\n", "20210525")
+		fmt.Printf("build ver:\t%s\n", "20220309")
 
 		os.Exit(0)
 	}
@@ -336,7 +334,7 @@ func main() {
 	var i int
 	var intChan chan int
 	intChan = make(chan int, *num)
-	if *del {
+	if *del == 1 {
 		_, err = db.Exec("truncate table " + *tablename)
 		log.Println(*tablename, "删除数据成功")
 	}
@@ -349,9 +347,9 @@ func main() {
 	for i = 0; i < *num; i++ {
 
 		if *num == 1 {
-			go loadcsv(*commitcount,*debug, *num, *wcomma, *isgbk, i, intChan, db, *csvfile, *tablename)
+			go loadcsv(*commitcount, *debug, *num, *wcomma, *isgbk, i, intChan, db, *csvfile, *tablename)
 		} else {
-			go loadcsv(*commitcount,*debug, *num, *wcomma, *isgbk, i, intChan, db, *csvfile, *tablename)
+			go loadcsv(*commitcount, *debug, *num, *wcomma, *isgbk, i, intChan, db, *csvfile, *tablename)
 		}
 
 	}
